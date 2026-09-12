@@ -33,11 +33,11 @@ function loadIndex() {
   return _index;
 }
 
-// Day-type bucket for a given instant in Chicago time. Matches the keys
+// Day-type bucket for a given instant in Cincinnati time. Matches the keys
 // produced by fetch-gtfs.js (weekday/saturday/sunday/weekend).
 function dayTypeFor(now = new Date()) {
   const weekday = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
     weekday: 'short',
   }).format(now);
   if (weekday === 'Sat') return 'saturday';
@@ -47,7 +47,7 @@ function dayTypeFor(now = new Date()) {
 
 function chicagoHour(now = new Date()) {
   const h = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
     hour: '2-digit',
     hour12: false,
   }).format(now);
@@ -56,13 +56,13 @@ function chicagoHour(now = new Date()) {
 
 function chicagoMinuteOfHour(now = new Date()) {
   const m = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
     minute: '2-digit',
   }).format(now);
   return parseInt(m, 10);
 }
 
-// Service-day transition is fuzzy around 4 AM: CTA encodes a trip that runs
+// Service-day transition is fuzzy around 4 AM: Go-Metro encodes a trip that runs
 // at 1:15 AM Sunday as "25:15:00" under Saturday's service_id, so at 1 AM
 // Sunday wall-clock the right bucket is Saturday's. We always consult both
 // yesterday's and today's dayType — the only question is which to prefer.
@@ -82,7 +82,7 @@ function hourlyLookup(byDayType, now) {
   const priorDt = dayTypeFor(new Date(now.getTime() - 24 * 60 * 60 * 1000));
 
   // Before 4 AM, prefer prior day's bucket — yesterday's service is still
-  // running its late-night tail (CTA encodes 1:15 AM Sunday as 25:15:00 under
+  // running its late-night tail (Go-Metro encodes 1:15 AM Sunday as 25:15:00 under
   // Saturday's service_id). After 4 AM, today's bucket is authoritative; do
   // NOT fall back to prior day, because an M-F-only route would otherwise
   // pick up Friday's counts on Saturday morning and look "scheduled."
@@ -282,7 +282,7 @@ function expectedBusRouteHeadwayMin(route, now = new Date()) {
 }
 
 // Train Tracker line codes (lowercase) → GTFS route_id in the index. These
-// are the only eight rail "routes" CTA publishes and the mapping is static.
+// Rail routes are not used for Go-Metro (bus-only).
 const TRAIN_LINE_TO_GTFS = {
   red: 'Red',
   blue: 'Blue',
@@ -577,12 +577,12 @@ function schedStopsByTrip(route, startSec) {
   return byTrip;
 }
 
-// Seconds since midnight in Chicago wall-clock for `now`. Matches the base of
+// Seconds since midnight in Cincinnati/Eastern wall-clock for `now`. Matches the base of
 // GTFS scheduled times (and stst) for daytime trips; the plausibility cap above
 // absorbs the after-midnight service-day wrap that this doesn't model.
 function chicagoSecondsOfDay(now = new Date()) {
   const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -648,12 +648,12 @@ function scheduleDeviationMin(vehicle, now = new Date()) {
   return dev;
 }
 
-// How long CTA's timetable says a bus takes to travel from `from` to `to`
+// How long Go-Metro's timetable says a bus takes to travel from `from` to `to`
 // (both { lat, lon }), read off the scheduled trip curve anchored by
 // `{ route, schedStartSec }` — normally the trailing bus's own trip. This is
 // the schedule-honest cost of the empty stretch in a gap: a flat "typical
 // speed" constant overstates it ~2x on routes that run long Lake Shore Drive
-// express segments (147, 6, 26, 146…), which CTA schedules at highway speed.
+// express segments, which Go-Metro schedules at highway speed.
 //
 // When several trips share the anchor their traverse times are combined by
 // median (robust to one odd booking). A short-turn trip that ends before `to`

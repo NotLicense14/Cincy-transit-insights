@@ -1,6 +1,6 @@
 const { getVehicles } = require('./api');
 
-// 60 mph cap — above CTA's ~35 mph route ceiling, but tighter than the
+// 60 mph cap — above Go-Metro's ~35 mph route ceiling, but tighter than the
 // train-class 70 to reject a GPS jump past a whole block.
 const DEFAULT_BUS_SAMPLE_OPTS = {
   maxDtMs: 3 * 60 * 1000,
@@ -16,7 +16,7 @@ function colorForBusSpeed(mph) {
   return '2ad17f'; // green
 }
 
-// Buckets align with CTA's slow-zone categories (15/25/35 mph). Extra purple
+// Speed buckets (15/25/35 mph). Extra purple
 // band sits above slow zones but below line speed; green is full-speed (~45+).
 function colorForTrainSpeed(mph) {
   if (mph == null) return '444'; // no data — dim gray

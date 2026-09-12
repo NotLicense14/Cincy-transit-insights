@@ -23,7 +23,7 @@ const SCHED_DB_PATH = Path.join(__dirname, '..', 'data', 'gtfs', 'schedule.sqlit
 // Rail is always all 8 lines.
 const { allRoutes } = require('../src/bus/routes');
 const BUS_ROUTES = [...allRoutes].sort();
-const RAIL_ROUTES = ['Red', 'Blue', 'Brn', 'G', 'Org', 'P', 'Pink', 'Y'];
+// No rail routes — Go-Metro is bus-only.
 
 async function downloadGtfs() {
   if (Fs.existsSync(ZIP_PATH)) {
@@ -300,9 +300,9 @@ async function main() {
 
   console.log('Reading calendar.txt...');
   const calendars = parseCsv(await readFromZip('calendar.txt'));
-  // Chicago calendar date — the schedule's own timezone, not the server's.
+  // Cincinnati calendar date — the schedule's own timezone, not the server's.
   const todayStr = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -333,7 +333,7 @@ async function main() {
   console.log('Reading trips.txt...');
   const trips = parseCsv(await readFromZip('trips.txt'));
   const busRouteSet = new Set(BUS_ROUTES);
-  const railRouteSet = new Set(RAIL_ROUTES);
+  const railRouteSet = new Set(); // Go-Metro is bus-only — no rail routes
   // tripMeta.mode (bus|rail) routes results to `routes` or `lines` output bucket.
   const tripMeta = new Map();
   for (const t of trips) {
@@ -353,7 +353,7 @@ async function main() {
     });
   }
   const busCount = [...tripMeta.values()].filter((m) => m.mode === 'bus').length;
-  const railCount = tripMeta.size - busCount;
+  const railCount = 0; // Go-Metro bus-only
   console.log(`  ${busCount} bus trips, ${railCount} rail trips in scope`);
 
   console.log('Streaming stop_times.txt...');

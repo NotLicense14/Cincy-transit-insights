@@ -22,7 +22,7 @@ const {
 const DUAL_DIR_OFFSET_FT = 250;
 
 // First/last bins of the train polyline are systematically null because the
-// CTA tracker has a position-update lag at terminals: legitimate
+// Go-Metro feed has a position-update lag at terminals: legitimate
 // terminal-departure pairs compute to 80–100 mph (artifact of dt being our
 // poll cadence rather than actual motion time) and get dropped by the maxMph
 // filter. For DISPLAY only — leaving binSpeeds untouched so summary.avg and

@@ -25,7 +25,7 @@ const DEFAULT_TICK_MS = 15_000;
 const DEFAULT_TICKS = 40; // 10 min of real time
 const DEFAULT_INTERPOLATE = 4; // turns 16 real samples → 61 smoothed frames
 const DEFAULT_FRAMERATE = 16; // ~4s clip at 16× speed
-// CTA's getvehicles can briefly drop a vehicle (GPS loss, prediction
+// Go-Metro's feed can briefly drop a vehicle (GPS loss, prediction
 // suppression near terminals, single missed poll). For tail drops (vehicle
 // never reappears) we render a fading gray ghost dead-reckoned along the
 // polyline at last-known speed for the rest of the clip rather than letting
@@ -44,7 +44,7 @@ async function captureBunchingVideo(bunch, pattern, opts = {}) {
   const bunchVids = new Set(bunch.vehicles.map((v) => v.vid));
   const snapshots = [{ ts: Date.now(), vehicles: bunch.vehicles }];
   // vid → first sighting under a different pid. A bunched vid that reappears on
-  // another pid has turned around at a terminal (CTA reassigns the trip), not
+  // another pid has turned around at a terminal (Go-Metro reassigns the trip), not
   // lost signal — the renderer uses this to show a turnaround, not a ghost.
   const turnedAround = new Map();
 
@@ -180,7 +180,7 @@ async function renderBunchingClip(snapshots, bunch, pattern, opts = {}) {
 
   // Per-vid turnaround terminus for tail drops. Bus polylines are end-to-end
   // (no Loop round-trip), so both endpoints are real terminals. A vid that
-  // reappeared under a different pid has *provably* turned around (CTA reassigns
+  // reappeared under a different pid has *provably* turned around (Go-Metro reassigns
   // the trip before the bus crawls the final layover), so force the nearer end
   // regardless of proximity; otherwise fall back to the proximity test.
   const finalByVid = new Map(snapshots[lastSnapIdx].vehicles.map((v) => [v.vid, v]));

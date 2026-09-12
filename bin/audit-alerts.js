@@ -18,7 +18,7 @@ async function main() {
   const issues = [];
 
   console.log(
-    'audit-alerts: checking 7 invariants — stuck CTA alerts (post_uri null >30 min), ' +
+    'audit-alerts: checking 7 invariants — stuck Go-Metro alerts (post_uri null >30 min), ' +
       'stuck train pulses (consecutive_ticks>5, no post), stuck bus pulses (same), ' +
       'cooldown table size + expired-but-lingering rows, ' +
       'orphan train_pulse cooldowns (no matching pulse_state row), ' +

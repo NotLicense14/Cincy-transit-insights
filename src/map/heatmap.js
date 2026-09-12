@@ -3,28 +3,28 @@ const { encode } = require('../shared/polyline');
 const { fitZoom, project } = require('../shared/projection');
 const { STYLE, WIDTH, HEIGHT, requireMapboxToken, fetchMapboxStatic } = require('./common');
 
-// Sized to contain the full CTA rail system so it sits centered in the
+// Sized to contain the full Go-Metro bus network so it sits centered in the
 // frame: Linden (Purple, ~42.073) and Dempster-Skokie (Yellow, ~42.038)
 // at the north, 95th/Dan Ryan (~41.722) at the south, Forest Park
 // (~41.875, -87.817) and O'Hare (~41.978, -87.904) at the west, and the
 // lakefront at the east. Earlier bbox stopped at 42.03, which clipped
 // the Yellow and Purple termini at the top of the image.
 const CHICAGO_BBOX = {
-  minLat: 41.69,
-  maxLat: 42.1,
-  minLon: -87.92,
-  maxLon: -87.52,
+  minLat: 38.9,
+  maxLat: 39.4,
+  minLon: -84.8,
+  maxLon: -84.2,
 };
 
 // Wider than the Loop proper (Wabash↔Wells, Lake↔Van Buren) — bus bunching
 // hotspots cluster heavily in River North and the West Loop, both just
-// outside the strict CTA Loop. Train heatmap also benefits from the wider
+// outside the strict downtown core. Bus heatmap benefits from the wider
 // view since five lines feed in from beyond the Loop rectangle.
 const LOOP_BBOX = {
-  minLat: 41.867, // Roosevelt Rd
-  maxLat: 41.9, // Chicago Ave
-  minLon: -87.658, // Halsted (West Loop)
-  maxLon: -87.617, // Lake Shore Dr
+  minLat: 39.09, // Downtown Cincinnati south
+  maxLat: 39.12, // Downtown Cincinnati north
+  minLon: -84.52, // Downtown Cincinnati west
+  maxLon: -84.49, // Downtown Cincinnati east
 };
 const LOOP_INSET_SIZE = 400;
 const LOOP_INSET_MARGIN = 20;
@@ -177,7 +177,7 @@ async function renderLoopInset({ points, kind, trainLines, lineColors }) {
   // Use whatever fitZoom gives us, only capped from above. Earlier code
   // forced a min of 13 and floored the zoom — both pushed the projection
   // tighter than the bbox, so south-edge Loop stations (Roosevelt etc.)
-  // and north-edge stations (Chicago Red) projected off the 400×400
+  // and north-edge stops projected off the 400×400
   // canvas. Their clusters then dropped silently and the inset's visible
   // total ran short of the main map's downtown bubble. fitZoom already
   // includes margin; trust it.
@@ -261,7 +261,7 @@ async function renderHeatmap({ points, kind, trainLines = null, lineColors = nul
     radiusForCount,
   );
   // Loop inset sits bottom-left, so anchor the legend top-right where it's
-  // unlikely to collide with hotspots (Chicago's east edge is the lakefront).
+  // unlikely to collide with hotspots (Cincinnati's east edge is the river).
   const maxClusterCount = clusters.reduce((m, c) => Math.max(m, c.count), 0);
   const legend = buildLegend(maxClusterCount);
   const legendX = WIDTH - legend.width - 20;

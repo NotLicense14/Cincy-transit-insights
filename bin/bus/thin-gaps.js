@@ -185,7 +185,7 @@ async function main() {
   const now = Date.now();
 
   // System-wide health check: if observeBuses hasn't recorded distinct
-  // snapshots recently, the upstream pipeline is broken (CTA API outage,
+  // snapshots recently, the upstream pipeline is broken (Go-Metro feed outage,
   // cron stall, DB issue). Firing under those conditions would fan a single
   // upstream incident out into a flood of route posts — bail and let the
   // existing detectors' own outage modes handle the alerting.

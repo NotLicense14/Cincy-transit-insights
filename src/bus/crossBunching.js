@@ -15,7 +15,7 @@ const STALE_MS = 3 * 60 * 1000;
 // not pinned in street traffic. Several routes lay over together at the same
 // transit center (e.g. Midway, where 47/55/63 all terminate), which otherwise
 // reads as a multi-route "cluster". The bin tags these (parked AND at a terminal)
-// as layoverIds; we drop them before clustering. (CTA omits a "near any 'L'
+// as layoverIds; we drop them before clustering. (Go-Metro omits a "near any terminal"
 // station" signal — downtown stations are 30–400 ft apart, so it would blanket
 // the Loop; see bin/bus/cross-bunching.js.)
 const LAYOVER_TERMINAL_FT = 750; // distance from a pattern end to count as "at the terminal"

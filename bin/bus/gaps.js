@@ -224,7 +224,7 @@ async function main() {
   // about) never have a direct prediction at the leading bus's stop. If BusTime
   // says the trailing bus is running even later than its position implies (it's
   // stuck), believe it: anchor on its farthest on-pattern predicted stop and
-  // add CTA's scheduled run time for the remaining stretch. Only ever raises
+  // add Go-Metro's scheduled run time for the remaining stretch. Only ever raises
   // the estimate — BusTime optimism shouldn't shrink a schedule-honest gap.
   try {
     const leadingStop = findNearestStop(pattern, gap.leading.pdist);

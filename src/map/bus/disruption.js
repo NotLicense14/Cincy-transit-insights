@@ -24,7 +24,7 @@ const { pairedStationLabels } = require('../disruption');
 const MAX_ROUTES = 5;
 
 // Distinct palette for multi-route alerts. Picked for high mutual contrast
-// on Mapbox's light style and to avoid collision with CTA train-line colors
+// on Mapbox's dark style
 // when a bus route runs along a rail corridor. First entry matches the
 // single-route cyan from common.js so a 1-route render is unchanged.
 const MULTI_ROUTE_PALETTE = [
@@ -63,7 +63,7 @@ async function renderBusDisruption({ routes, getKnownPidsForRoute, loadPattern, 
       }
     }
     if (patterns.length === 0) continue;
-    // Pick the single longest pattern. CTA bus pids come in pairs
+    // Pick the single longest pattern. Go-Metro bus pids come in pairs
     // (NB/SB) that often run on a one-way street pair through downtown —
     // drawing both produces a parallel doubled line that reads as visual
     // noise. One pattern is enough to convey "is this my route?", the
@@ -168,7 +168,7 @@ async function renderBusDisruption({ routes, getKnownPidsForRoute, loadPattern, 
     .toBuffer();
 }
 
-// Walk pattern.points (which carries pdist on each vertex from CTA) and
+// Walk pattern.points (which carries pdist on each vertex) and
 // split into [beforeFocus, insideFocus, afterFocus] coord arrays. Each is a
 // list of [lat, lon] pairs ready for polyline encoding. If pdist is missing
 // on the pattern, falls back to no split (whole route returned as `before`).
@@ -223,7 +223,7 @@ function terminalStops(pattern) {
 // Rich single-route renderer used by held-cluster + blackout posts. Either
 // draws the full route dimmed (for blackouts where the entire route is
 // silent) or splits the route into dimmed-outside + bright-focus (for
-// held-cluster + extracted-from-CTA-alert "between X and Y" posts).
+// held-cluster + extracted-from-Go-Metro-alert "between X and Y" posts).
 //
 // `focusZone` (optional): { centerPdist, halfWidthFt } — the affected stretch
 // in pdist space. When present, the render dims everything outside and
@@ -296,7 +296,7 @@ async function renderBusDisruptionRich({ route, pattern, focusZone, title, mode 
     overlays.push(`path-${SEGMENT_STROKE}+${ROUTE_CORE_COLOR}-${DIM_OPACITY}(${enc})`);
   }
   // Active stretch in red for held mode (alarm color) or route cyan for the
-  // CTA-alert "between X and Y" segment mode. Drawn thicker so it visually
+  // Go-Metro-alert "between X and Y" segment mode. Drawn thicker so it visually
   // dominates the dim outline even at a citywide zoom.
   const activeColor = mode === 'held' ? 'ff3030' : ROUTE_CORE_COLOR;
   for (const seg of active) {

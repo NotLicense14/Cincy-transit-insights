@@ -260,7 +260,7 @@ function db() {
     -- Metra GTFS-realtime TripUpdate snapshots: one row per (snapshot tick,
     -- trip, stop). The substrate for delay computation and inferred-cancellation
     -- detection (a scheduled trip whose stops never get a live prediction).
-    -- Unlike CTA, Metra binds each scheduled trip_id to live predictions, so we
+    -- Unlike CTA-style APIs, Go-Metro binds each scheduled trip_id to live predictions, so we
     -- store the per-stop predicted vs scheduled times directly rather than
     -- reconstructing service statistically. 7-day rolloff like observations.
     CREATE TABLE IF NOT EXISTS metra_trip_updates (
@@ -348,9 +348,9 @@ function db() {
     ['approx', 'INTEGER'],
     ['next_station', 'TEXT'],
     // Metra positions carry a GTFS trip_id (e.g. `BNSF_BN1272_V2_B`) that joins
-    // directly to the static schedule index. CTA bus/train rows leave it null.
+    // directly to the static schedule index. Go-Metro bus rows leave it null.
     ['trip_id', 'TEXT'],
-    // CTA bus schedule anchor (getvehicles `stst`/`stsd`): the trip's scheduled
+    // Bus schedule anchor: the trip's scheduled
     // start as seconds-since-midnight + service date. Persisted so a post built
     // from the cached snapshot can still resolve schedule adherence. Null for
     // train/metra rows.
@@ -375,17 +375,17 @@ function db() {
   if (!alertCols.includes('affected_direction')) {
     _db.exec('ALTER TABLE alert_posts ADD COLUMN affected_direction TEXT');
   }
-  // CTA-side timing windows from the alert's EventStart / EventEnd fields.
-  // Useful for forensic timing analysis on alerts the CTA scrubs immediately
+  // Timing windows from the alert's EventStart / EventEnd fields.
+  // Useful for forensic timing analysis on alerts Go-Metro scrubs immediately
   // (their `?alertid=` lookup stops returning the row, so we'd otherwise lose
-  // CTA's own claimed start/end the moment they pull it from the active feed).
+  // Go-Metro's own claimed start/end the moment they pull it from the active feed).
   if (!alertCols.includes('cta_event_start_ts')) {
     _db.exec('ALTER TABLE alert_posts ADD COLUMN cta_event_start_ts INTEGER');
   }
   if (!alertCols.includes('cta_event_end_ts')) {
     _db.exec('ALTER TABLE alert_posts ADD COLUMN cta_event_end_ts INTEGER');
   }
-  // CTA sometimes posts EventStart/EventEnd as date-only strings (e.g.
+  // Go-Metro sometimes posts EventStart/EventEnd as date-only strings (e.g.
   // "2026-05-25") rather than full timestamps. We parse those to end-of-day
   // so any time-math still works, but track the date-only origin so the UI
   // can render "Sun May 25" without a misleading 11:59 PM. Stored as 0/1.
@@ -399,9 +399,9 @@ function db() {
       'ALTER TABLE alert_posts ADD COLUMN cta_event_end_is_date_only INTEGER NOT NULL DEFAULT 0',
     );
   }
-  // CTA's own body text for the alert (ShortDescription, falling back to
+  // Go-Metro's own body text for the alert (ShortDescription, falling back to
   // FullDescription at write time). Surfaced verbatim on the public event
-  // page so readers see the reroute/closure details CTA published, not just
+  // page so readers see the reroute/closure details Go-Metro published, not just
   // the one-line headline.
   if (!alertCols.includes('short_description')) {
     _db.exec('ALTER TABLE alert_posts ADD COLUMN short_description TEXT');
@@ -409,14 +409,14 @@ function db() {
   // Backdate support: when the first missing tick fires, stash its timestamp
   // here. recordAlertResolved promotes it to resolved_ts when the clear-tick
   // threshold trips, so the recorded resolution time reflects the first tick
-  // CTA dropped the alert, not the threshold tick (~one cadence later).
+  // Go-Metro dropped the alert, not the threshold tick (~one cadence later).
   if (!alertCols.includes('pending_resolved_ts')) {
     _db.exec('ALTER TABLE alert_posts ADD COLUMN pending_resolved_ts INTEGER');
   }
   // Canonical station names mentioned in the alert text, resolved against the
   // line's roster (line-scoped to disambiguate cross-line same-named stations).
   // JSON-encoded array of strings. Drives station-page coverage and stats for
-  // CTA alerts the same way `from_station`/`to_station` does for bot
+  // Go-Metro alerts the same way `from_station`/`to_station` does for bot
   // observations. See extractMentionedStations in shared/ctaAlerts.
   if (!alertCols.includes('mentioned_stations')) {
     _db.exec('ALTER TABLE alert_posts ADD COLUMN mentioned_stations TEXT');
@@ -470,7 +470,7 @@ function db() {
   // has no version history yet. Runs once at startup after the table is
   // created (or after an existing DB picks up the new table on this deploy).
   // Without this, the event page's "Message history" timeline would be empty
-  // for every pre-existing alert until CTA happens to edit it again.
+  // for every pre-existing alert until Go-Metro happens to edit it again.
   _db.exec(`
     INSERT INTO alert_versions
       (alert_id, ts, headline, short_description,
@@ -763,7 +763,7 @@ function recordAlertSeen(
   const sd = shortDescription == null ? null : shortDescription;
   const existing = getAlertPost(alertId);
   // Decide whether to record a new version row. A "version" is the
-  // user-visible message text plus its affected scope; CTA edits any of
+  // user-visible message text plus its affected scope; Go-Metro edits any of
   // these as the situation evolves (e.g. "trains stopped" → "service
   // restoring"). We only count a change when the incoming value is
   // non-null and differs from what's stored — the surrounding UPDATEs use
@@ -807,7 +807,7 @@ function recordAlertSeen(
           existing.resolved_ts >= Math.max(existing.delay_deadline_ts, existing.first_seen_ts)));
     // A genuinely new chapter under the same alert id: the post finally landed
     // after a premature resolution sweep wiped resolved_ts before any post
-    // existed, or CTA re-published the same id after a long enough gap to count
+    // existed, or Go-Metro re-published the same id after a long enough gap to count
     // as a fresh incident. New chapters start clean — clear resolved_ts AND the
     // prior chapter's resolution reply, and log a version unconditionally so
     // the timeline shows the gap even if the text is unchanged.
@@ -815,11 +815,11 @@ function recordAlertSeen(
       wasResolved &&
       !scheduleTerminalResolved &&
       ((postUri && !existing.post_uri) || now - existing.last_seen_ts > ALERT_FLICKER_RESET_MS);
-    // A short flicker: CTA dropped the alert long enough for us to resolve it
+    // A short flicker: Go-Metro dropped the alert long enough for us to resolve it
     // (≥ ALERT_CLEAR_TICKS absent) but re-listed it within the flicker window.
     // It's the SAME incident, not a new one — clear resolved_ts so tracking
     // resumes and the duration reflects the real end, but KEEP
-    // resolved_reply_uri so postResolution skips a duplicate "CTA cleared"
+    // resolved_reply_uri so postResolution skips a duplicate "Go-Metro cleared"
     // reply when it re-resolves. Without this, an alert that flickers out for
     // 6–30 min stays frozen at the premature resolved_ts while versions and
     // last_seen_ts keep advancing (duration < time of the last version).
@@ -1172,8 +1172,8 @@ function getRecentPulsePost(
   );
 }
 
-// Asks "is there an unresolved CTA alert on this route right now?". Replaces
-// the old time-windowed `ctaAlertPostedSince` which missed CTA-first-pulse-
+// Asks "is there an unresolved Go-Metro alert on this route right now?". Replaces
+// the old time-windowed `alertPostedSince` which missed alert-first-pulse-
 // second cases (alert's first_seen_ts < pulse start).
 function hasUnresolvedCtaAlert({ kind, ctaRouteCode }) {
   const row = db()
@@ -1228,7 +1228,7 @@ function hasObservedClearForPulse({ kind, pulseUri }) {
 // caller-side scoring (e.g. station-overlap matching).
 function getRecentPulsePostsAll({ kind, line, withinMs }, now = Date.now()) {
   // Exclude pulses that already have a paired 'observed-clear' on the same
-  // line/direction/segment after them. Without this filter, a CTA alert can
+  // line/direction/segment after them. Without this filter, a Go-Metro alert can
   // get threaded under a pulse whose Bluesky thread already has a resolution
   // reply at the bottom — resolveReplyRef walks to the latest leaf and lands
   // the alert as a reply to "service has been restored", which reads as
@@ -1608,7 +1608,7 @@ function clearBusPulseState(route) {
 function chicagoStartOfDay(ts) {
   const d = new Date(ts);
   const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -2014,7 +2014,7 @@ const RUSH_BOUNDARIES_HOURS = [5, 10, 15, 20];
 function chicagoStartOfRushPeriod(ts) {
   const dayStart = chicagoStartOfDay(ts);
   const ctParts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
     hour: '2-digit',
     hour12: false,
   }).formatToParts(new Date(ts));

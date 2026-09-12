@@ -1,4 +1,4 @@
-// CTA Bus Tracker doesn't expose vehicle type. We classify by vid range,
+// Go-Metro doesn't expose vehicle type in the GTFS-rt feed. We classify by vid range,
 // sourced from chicagobus.org + chicagorailfan.com cross-checks. See
 // ./data/artics.json for ranges and provenance.
 const articData = require('./data/artics.json');

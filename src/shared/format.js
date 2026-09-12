@@ -39,12 +39,13 @@ function formatDeviation(min) {
   return r > 0 ? `${r} min late` : `${-r} min early`;
 }
 
+// Formats a Date as Eastern Time (Cincinnati) — function name kept for compatibility
 function formatTimeCT(date) {
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
   });
 }
 

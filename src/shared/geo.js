@@ -15,7 +15,7 @@ function haversineFt(a, b) {
 
 /**
  * Walk pattern points in seq order and return a parallel array of cumulative
- * distance in feet. The CTA API only populates pdist on stop points, so we can't
+ * distance in feet. The Go-Metro feed does not supply pdist, so we can't
  * rely on it for slicing arbitrary windows of the polyline.
  */
 function cumulativeDistances(points) {

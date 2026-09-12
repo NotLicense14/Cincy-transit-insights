@@ -10,15 +10,15 @@
 // If output-path is omitted, JSON is written to stdout.
 //
 // Counting choices (intentional, may differ slightly from Timeline):
-//   - Bucket by START time in Chicago calendar days. A multi-day disruption
+//   - Bucket by START time in Cincinnati calendar days. A multi-day disruption
 //     counts once on its start day, not every day it touched. Matches the
 //     hour-of-week heatmap semantics on the web side.
 //   - Two top-level totals per day:
-//       train_count / bus_count          — raw counts, no merge. A CTA alert
+//       bus_count          — raw counts, no merge. A Go-Metro alert
 //         plus a matching bot observation counts as 2. Useful for "amount of
 //         signal activity that day."
 //       train_merged_count / bus_merged_count — distinct-incident counts.
-//         A CTA alert and a matching bot observation collapse into 1.
+//         A Go-Metro alert and a matching bot observation collapse into 1.
 //         Mirrors the Timeline view on the web side so the calendar tile
 //         number matches what users see when they click through.
 //     Merge logic is inlined below; intentionally duplicated from
@@ -39,13 +39,13 @@ const Database = require('better-sqlite3');
 const DB_PATH =
   process.env.HISTORY_DB_PATH || Path.join(__dirname, '..', 'state', 'history.sqlite');
 
-const CHICAGO_TZ = 'America/Chicago';
+const CINCINNATI_TZ = 'America/New_York';
 // en-CA's default format for these options is YYYY-MM-DD (ISO 8601 order),
 // which is what we want for the date keys. The locale pick is purely about
 // component ordering — output is language-neutral digits, so this isn't a
 // statement about the audience. en-US would give MM/DD/YYYY here.
 const dayFmt = new Intl.DateTimeFormat('en-CA', {
-  timeZone: CHICAGO_TZ,
+  timeZone: CINCINNATI_TZ,
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
@@ -192,8 +192,8 @@ function main() {
 
   const { merged, standaloneAlerts, standaloneObs } = mergeMatchingIncidents(normAlerts, normObs);
 
-  // Bucket by Chicago calendar day. Each entry: train_count + bus_count are
-  // raw signal totals; train_merged_count + bus_merged_count collapse a CTA
+  // Bucket by Cincinnati/Eastern calendar day. Each entry: train_count + bus_count are
+  // raw signal totals; bus_merged_count collapses a Go-Metro
   // alert + matching bot observation into one. by_line/by_route remain
   // per-route counts that may sum higher when an alert covers multiple routes.
   const byDay = new Map();

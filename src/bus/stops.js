@@ -1,6 +1,6 @@
 const { bearing } = require('../shared/geo');
 
-// CTA pattern points are tagged 'S' (stop) or 'W' (waypoint); only stops
+// Pattern points are tagged 'S' (stop) or 'W' (waypoint); only stops
 // have stopName populated. We also attach a local bearing computed from a
 // short window of surrounding pattern points so the renderer can offset each
 // stop perpendicular to its own segment of the route — using a single global

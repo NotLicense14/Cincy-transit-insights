@@ -2,7 +2,7 @@
 
 This is a single-agency fork of the original [cta-insights project](https://github.com/cailinpitt/chicago-transit-insights.git) by Cailin Pitt and is loosely based off of the [cota-insights bot](https://github.com/trevinflick/transit-insights.git) by Trevin Flickinger. 
 
-Cincinnati has real-time GFTS data for their bus and streetcar, however, the intercity rail line does not have any real-time data. This is a Bluesky bot that turn that tracker data into Cincy-specific transit visualizations. 
+Cincinnati has real-time GTFS data for their bus and streetcar, however, the intercity rail line does not have any real-time data. This is a Bluesky bot that turn that tracker data into Cincy-specific transit visualizations. 
 
 - **Bus**: [@](https://bsky.app/profile/)
 - **Alerts**: [@](https://bsky.app/profile/)
@@ -43,7 +43,7 @@ The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
    | `BLUESKY_SERVICE` | Bluesky PDS URL | defaults to `https://bsky.social` |
    | `BLUESKY_BUS_IDENTIFIER` | Bus bot handle or DID | your Bluesky account |
    | `BLUESKY_BUS_APP_PASSWORD` | Bus bot app password | bsky.app → Settings → App Passwords |
-   No API key is necessary to access Go-Metro GFTS data.
+   No API key is necessary to access Go-Metro GTFS data.
 
 4. **Build the GTFS index** — required before any gap or ghost detection runs.
    ```
@@ -143,7 +143,7 @@ Each major feature has a deep-dive doc in [`docs/`](docs/):
 - [SPEEDMAP.md](docs/SPEEDMAP.md) — colored route speed maps.
 
 ### Data sources
-- **Go-Metro GFTS-realtime** — live vehicle positions, polled by each script for its detection window.
+- **Go-Metro GTFS-realtime** — live vehicle positions, polled by each script for its detection window.
 - **GTFS static feed** — the scheduled baseline for gap and ghost detection. Rebuilt daily from the Metro's published bundle into `data/gtfs/index.json`. Headways/durations are keyed **per pattern** — `(route/line, direction) → patterns[]`, where each pattern is one origin→dest terminal pair with its own `(day_type, hour) → { median headway, median trip duration }`. Measuring within a single pattern keeps short-turns and branches from corrupting the median (mixing them per-direction read the 66 at ~6 min vs a true 30 overnight). A live vehicle's pattern is matched to a group by its endpoint coordinates.
 - **OpenStreetMap (Overpass)** — traffic signal nodes inside a Cincinnati bounding box, used to annotate bus bunching timelapses. Rebuilt monthly.
 - **Mapbox Static Images API** — base maps for every rendered image.

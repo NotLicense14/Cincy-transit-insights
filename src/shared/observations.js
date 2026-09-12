@@ -80,7 +80,7 @@ function recordTrainObservations(trains, now = Date.now()) {
 
 // Metra GTFS-rt VehiclePositions. Stored in the shared observations table with
 // kind='metra' so the corridor/speed reads work the same as bus/train, plus the
-// GTFS `trip_id` (which joins directly to the static schedule index — unlike CTA,
+// GTFS `trip_id` (which joins directly to the static schedule index —
 // where vehicles are anonymous). `direction`/`destination` are left null at
 // ingest; detectors resolve them from the index via trip_id. Errors swallowed so
 // a logger hiccup never breaks the API caller.
@@ -271,7 +271,7 @@ function getLastBusObservationTs(route) {
   return row?.ts ?? null;
 }
 
-// Distinct pids (CTA `direction` field) seen for a route in the lookback.
+// Distinct pids (trip_id / shape_id) seen for a route in the lookback.
 // Used by callers that need to resolve patterns for a route without
 // re-fetching the live API (alerts, pulse).
 function getKnownBusPidsForRoute(route, sinceTs) {

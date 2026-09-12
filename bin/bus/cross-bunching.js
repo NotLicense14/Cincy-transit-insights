@@ -75,7 +75,7 @@ async function findLayoverVids(vehicles, stoppedIds) {
 }
 
 // Name the cluster by the nearest stop across the involved routes' patterns
-// (CTA has no global stop list; stops live on patterns). Best-effort — returns
+// (Go-Metro has no global stop list; stops live on patterns). Best-effort — returns
 // null when nothing is close, and the post just drops the "near X" clause.
 async function placeNameForCluster(cluster) {
   const pids = [...new Set(cluster.vehicles.map((v) => v.pid).filter(Boolean))];

@@ -72,15 +72,15 @@ function postUrl(result) {
   return `https://bsky.app/profile/${did}/post/${rkey}`;
 }
 
-const TRANSIT_CHICAGO_URL = 'https://www.transitchicago.com/';
+const GO_METRO_URL = 'https://www.go-metro.com/';
 
-// CTA alert posts mention the bare domain "transitchicago.com" in their body,
+// Go-Metro alert posts mention the bare domain "go-metro.com" in their body,
 // but image/video/text posts carry no facets, so the domain isn't tappable.
-// Build a richtext link facet over that mention pointing at the CTA homepage.
+// Build a richtext link facet over that mention pointing at the Go-Metro homepage.
 // Returns undefined when the text doesn't mention the domain (e.g. analytics
 // or bunching posts), so it's safe to call on every post.
 function transitChicagoFacets(text) {
-  const needle = 'transitchicago.com';
+  const needle = 'go-metro.com';
   const idx = text.indexOf(needle);
   if (idx < 0) return undefined;
   const enc = (s) => Buffer.byteLength(s, 'utf8');
@@ -90,7 +90,7 @@ function transitChicagoFacets(text) {
         byteStart: enc(text.slice(0, idx)),
         byteEnd: enc(text.slice(0, idx + needle.length)),
       },
-      features: [{ $type: 'app.bsky.richtext.facet#link', uri: TRANSIT_CHICAGO_URL }],
+      features: [{ $type: 'app.bsky.richtext.facet#link', uri: GO_METRO_URL }],
     },
   ];
 }
@@ -263,7 +263,7 @@ async function postTextWithLinkCard(agent, text, replyRef, link) {
 }
 
 // Login helper for the dedicated alerts/disruptions account. Used by
-// bin/{bus,train}/alerts.js (CTA-sourced alerts) and bin/train/pulse.js
+// bin/bus/alerts.js (Go-Metro-sourced alerts)
 // (auto-detected service disruptions). Kept separate from the analytics-
 // focused bus/train accounts so followers can opt into one stream or the
 // other.
@@ -294,7 +294,7 @@ async function getPostRecord(agent, uri) {
 // Walk down the thread starting at `parentUri` and return a reply ref whose
 // `parent` is the most recent leaf — this keeps the thread linear when
 // quote-attach posts have been added between the original post and now (e.g.
-// related-quotes inserts on bunching/gap posts under a CTA alert thread).
+// related-quotes inserts on bunching/gap posts under a Go-Metro alert thread).
 // Without this, the resolution post becomes a sibling of the original alert
 // rather than a continuation of the chain.
 async function resolveReplyRef(agent, parentUri) {

@@ -1,5 +1,5 @@
 // Retry an async operation with jittered exponential backoff. Defaults are
-// tuned for the CTA APIs: 3 attempts spaced ~0.5s, ~1.2s. A single transient
+// tuned for Go-Metro GTFS-rt feeds: 3 attempts spaced ~0.5s, ~1.2s. A single transient
 // 5xx or socket reset shouldn't kill a whole detection cycle.
 async function withRetry(fn, { attempts = 3, baseMs = 500, label = 'op' } = {}) {
   let lastErr;

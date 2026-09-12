@@ -65,7 +65,7 @@ async function main() {
   const now = Date.now();
   const sinceTs = now - WINDOW_MS;
   // Only warn about missing index entries for routes we actually saw run in
-  // the window. CTA's GTFS feed omits Night Owl (N*) and seasonal/special
+  // the window. Go-Metro's GTFS feed omits seasonal/special
   // routes entirely (10, 19, 128, 130, …) — those are expected absences,
   // re-running fetch-gtfs won't help, and the noise drowns out real misses.
   const unindexed = allRoutes.filter(

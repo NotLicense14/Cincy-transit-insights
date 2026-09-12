@@ -44,7 +44,7 @@ const ROUTE_COLORS = {
   53: 'ec407a', // Pulaski
   56: '7cb342', // Milwaukee
   65: 'ff9800', // Grand
-  66: '42a5f5', // Chicago
+  19: '42a5f5', // Vine
   77: '5c6bc0', // Belmont
   79: '00acc1', // 79th
   X9: 'b71c1c',
@@ -60,7 +60,7 @@ const ROUTE_NAMES = {
   53: 'Pulaski',
   56: 'Milwaukee',
   65: 'Grand',
-  66: 'Chicago',
+  19: 'Vine',
   77: 'Belmont',
   79: '79th',
 };
@@ -404,7 +404,7 @@ async function main() {
   const tsStr =
     new Date(ts)
       .toLocaleString('en-US', {
-        timeZone: 'America/Chicago',
+        timeZone: 'America/New_York',
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',

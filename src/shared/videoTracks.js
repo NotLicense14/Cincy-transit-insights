@@ -1,5 +1,5 @@
 // Shared dropout/gap model for the server-rendered vehicle timelapses — train
-// (snapshot, bunching, gap) and bus (bunching). The CTA feeds briefly drop
+// (snapshot, bunching, gap) and bus (bunching). The Go-Metro feeds briefly drop
 // vehicles all the time (GPS loss, tunnels, prediction suppression near
 // terminals/yards, the train 0,0 glitch, a single missed poll). Before this,
 // each video reinvented "what to do when a vehicle vanishes":

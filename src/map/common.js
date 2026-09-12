@@ -226,7 +226,7 @@ async function buildGhostLegend(x, y) {
   const discR = 16;
   const padX = 16;
   const fontSize = 26;
-  const text = 'Faded = signal lost from CTA';
+  const text = 'Faded = signal lost from Go-Metro';
   if (cachedGhostLegendTextWidth == null) {
     cachedGhostLegendTextWidth = await measureTextWidth(text, fontSize, { bold: true });
   }
@@ -315,7 +315,7 @@ async function fetchMapboxStatic(url, timeoutMs = 30000) {
 }
 
 // Interpolated start/end points at exact bin boundaries — sparse polylines
-// (CTA train lines have ~80 vertices over 20 mi) would otherwise drop bins.
+// (sparse polylines with many vertices over long distances) would otherwise drop bins.
 function sliceIntoSegments(points, cumDist, numBins) {
   const total = cumDist[cumDist.length - 1];
   const segLen = total / numBins;

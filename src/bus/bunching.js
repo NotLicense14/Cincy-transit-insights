@@ -1,10 +1,10 @@
 const { haversineFt } = require('../shared/geo');
 
-const BUNCHING_THRESHOLD_FT = 800; // ~2.5 Chicago city blocks
+const BUNCHING_THRESHOLD_FT = 800;
 const STALE_MS = 3 * 60 * 1000;
 const TERMINAL_PDIST_FT = 500; // start-terminal layovers, not real bunching
 // Geographic straight-line distance is bounded by along-route distance, so any
-// excess over pdist span means CTA's pdist is stale/wrong (e.g. a bus that just
+// excess over pdist span means pdist is stale/wrong (e.g. a bus that just
 // laid over and is starting a new run before pdist refreshes). Slack covers GPS
 // jitter and minor route curvature against the chord.
 const GEO_SLACK_FT = 500;

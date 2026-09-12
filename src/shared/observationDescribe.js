@@ -20,7 +20,7 @@ const TRAIN_LINES = {
   yellow: 'Yellow',
 };
 
-// CTA short-code → full-name aliases. Mirrors cta-alert-history's ctaLines.js
+// Line short-code → full-name aliases.
 // so a row with `line: 'brn'` describes as "Brown Line" without the renderer
 // having to normalize first.
 const LINE_ALIAS = {

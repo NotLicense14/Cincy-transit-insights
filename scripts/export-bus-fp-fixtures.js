@@ -27,7 +27,7 @@ const FIXTURES = [
   {
     name: 'bus-feed-outage-2026-05-28-2143',
     note:
-      'CTA Bus Tracker feed froze 21:06→21:44 CDT; every route went cold at once. ' +
+      'Go-Metro GTFS-rt feed froze 21:06→21:44 EST; every route went cold at once. ' +
       'Detector flagged 54/63/66/72/79 (all FPs). `now` is anchored to 21:43, the ' +
       'tick where all 5 were simultaneously strict-zero (54/66/72/79 went cold by ' +
       '21:33; 63, with a slightly longer headway, by 21:43). The global newest ' +

@@ -142,7 +142,7 @@ function pickReplayableIncident(incident) {
   };
 }
 
-// Resolve the affected direction's `dir` code (CTA trDr) from the human
+// Resolve the affected direction's `dir` code from the human
 // direction label, by matching its named terminus to the destination text the
 // trains in that direction carry. Destination text is authoritative (a Loop-
 // bound train is destined "Loop"); position heuristics are too noisy overnight.
@@ -176,7 +176,7 @@ function resolveAffectedDir(directionLabel, destByDir) {
 
 // A new direction must persist for at least this many consecutive pings before
 // we treat it as a real turnaround and split the track. A 1-ping opposite-dir
-// blip (CTA trDr noise) is absorbed into the current run instead.
+// blip (direction noise) is absorbed into the current run instead.
 const MIN_DIR_RUN = 2;
 
 // Split a vehicle's ts-ordered rows into runs of a single travel direction. A

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // One-off: delete the 2026-05-28 fleet-wide feed-outage FPs from Bluesky and
-// the history DB. The CTA Bus Tracker feed froze 21:06→21:44 CDT; every route
+// the history DB. The Go-Metro GTFS-rt feed froze 21:06→21:44 EST; every route
 // went cold at once and bus-pulse posted 5 blackout FPs (routes 54/63/66/72/79)
 // plus their ✅ resolutions. The website rebuilds alerts.json from the DB, so
 // removing these rows + re-running bin/push-web-data.sh drops them from the

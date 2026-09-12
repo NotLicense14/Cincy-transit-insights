@@ -8,7 +8,7 @@ const { terminalZoneFt } = require('../shared/geo');
 const RATIO_THRESHOLD = 2.5;
 const ABSOLUTE_MIN_MIN = 15;
 
-// `scheduledTraverseFor(trailing, leading)` → CTA-timetabled minutes to cover
+// `scheduledTraverseFor(trailing, leading)` → Go-Metro-timetabled minutes to cover
 // the empty stretch between the two buses, or null. When available it replaces
 // the flat-10-mph estimate (which overstates express-on-Lake-Shore-Drive gaps
 // ~2x). Trusted only when it lands in a sane band around the crude estimate —
@@ -55,7 +55,7 @@ function detectAllGaps(
       if (a.pdist < zoneFt) continue;
       if (patternLengthFt - b.pdist < zoneFt) continue;
 
-      // Prefer CTA's scheduled run time for this exact stretch over the flat
+      // Prefer Go-Metro's scheduled run time for this exact stretch over the flat
       // 10-mph model. Guard band: schedule up to 4x faster (express segments)
       // and up to 2x slower than the crude estimate — outside that is a
       // misprojection (short-turn trip, terminal clamp), so keep the flat number.

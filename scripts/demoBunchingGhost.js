@@ -1,6 +1,6 @@
 // Demo script for the tail-drop ghost rendering in bunching videos.
 //
-// Builds synthetic snapshots of three buses on CTA pattern 100 (route 72,
+// Builds synthetic snapshots of three buses on Go-Metro pattern (route 17,
 // North Ave eastbound) where one bus disappears mid-clip and never returns.
 // Stubs getVehicles via the require cache so captureBunchingVideo runs its
 // normal pipeline against scripted data, then writes the resulting MP4 to

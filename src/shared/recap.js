@@ -137,7 +137,7 @@ function ctWallTimeAsUtcMs(year, month, day, hour) {
   for (const offsetHours of [5, 6]) {
     const candidate = Date.UTC(year, month - 1, day, offsetHours, 0, 0);
     const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/Chicago',
+      timeZone: 'America/New_York',
       hour12: false,
       year: 'numeric',
       month: '2-digit',
@@ -154,12 +154,12 @@ function ctWallTimeAsUtcMs(year, month, day, hour) {
       return candidate;
     }
   }
-  throw new Error(`No UTC offset lands ${year}-${month}-${day} ${hour}:00 in America/Chicago`);
+  throw new Error(`No UTC offset lands ${year}-${month}-${day} ${hour}:00 in America/New_York`);
 }
 
 function ctDateParts(ms) {
   const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
+    timeZone: 'America/New_York',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // Bus alerts post a route-overview map (bus reroutes don't map onto a
 // from→to polyline segment the way rail outages do, so the image just shows
-// the affected route polylines highlighted on a Chicago basemap — a rider's
+// the affected route polylines highlighted on a Cincinnati basemap — a rider's
 // "is this me?" cue). Falls back to text-only when patterns can't be
 // rendered (route never observed, multi-route over the URL cap, etc.).
 //
 // When a recent bus pulse post exists for any of the alert's routes, the
-// CTA alert threads under it so all signals about one disruption converge
+// Go-Metro alert threads under it so all signals about one disruption converge
 // to a single thread. Symmetric to bin/train/alerts.js.
 
 require('../../src/shared/env');
@@ -55,7 +55,7 @@ const PULSE_LOOKBACK_MS = 24 * 60 * 60 * 1000;
 const DRY_RUN = process.env.ALERTS_DRY_RUN === '1' || process.argv.includes('--dry-run');
 const KIND = 'bus';
 
-// Filter to every CTA bus route in `names`. The significance filter in
+// Filter to every Go-Metro bus route in `names`. The significance filter in
 // ctaAlerts.js does the real gating — minor reroutes and bus-stop changes
 // don't make it through — so narrowing to bunching/gaps/speedmap/ghosts
 // just dropped major disruptions on long-tail routes.
@@ -67,7 +67,7 @@ function isRelevant(alert) {
 }
 
 // Find the most recent bus pulse post on any of the alert's routes so the
-// CTA alert can thread under it. Bus pulse posts are per-route — no
+// Go-Metro alert can thread under it. Bus pulse posts are per-route — no
 // station-overlap scoring needed; just take the most-recent across all
 // matching routes.
 function findRecentBusPulse(alert, now = Date.now()) {
@@ -170,7 +170,7 @@ async function postNewAlert(alert, agentGetter) {
 
 async function postResolution(alertRow, agentGetter) {
   // Already carries a resolution reply from an earlier chapter: the alert
-  // flickered out, we posted "CTA cleared", then CTA re-listed it within the
+  // flickered out, we posted "Go-Metro cleared", then Go-Metro re-listed it within the
   // flicker window and recordAlertSeen reopened it (keeping resolved_reply_uri).
   // Re-stamp resolved_ts to this clear without posting a duplicate reply.
   if (alertRow.resolved_reply_uri) {
@@ -224,10 +224,10 @@ async function main() {
   const alerts = await fetchAlerts({ activeOnly: true });
   const relevant = alerts.filter(isRelevant);
   const activeIds = new Set(relevant.map((a) => a.id));
-  // Pre-filter set: alerts CTA still considers active, regardless of our
-  // significance gate. Used by the resolution sweep to distinguish "CTA
+  // Pre-filter set: alerts Go-Metro still considers active, regardless of our
+  // significance gate. Used by the resolution sweep to distinguish "Go-Metro
   // cleared this" (post a resolution reply) from "we filtered it out"
-  // (silent close — posting a 'CTA has cleared' reply would be a lie).
+  // (silent close — posting a 'Go-Metro has cleared' reply would be a lie).
   const ctaActiveIds = new Set(alerts.map((a) => a.id));
 
   console.log(
@@ -266,7 +266,7 @@ async function main() {
     }
   }
 
-  // Quote-attach pass — runs regardless of CTA-fetch outcome.
+  // Quote-attach pass — runs regardless of Go-Metro-fetch outcome.
   try {
     await sweepRelatedQuotes({
       kind: KIND,
@@ -281,7 +281,7 @@ async function main() {
   }
 
   if (alerts.length === 0) {
-    console.warn('CTA returned 0 active alerts — skipping resolution sweep this tick');
+    console.warn('Go-Metro returned 0 active alerts — skipping resolution sweep this tick');
     return;
   }
 
@@ -292,19 +292,19 @@ async function main() {
       if (!DRY_RUN && row.clear_ticks > 0) resetAlertClearTicks(row.alert_id);
       continue;
     }
-    // Still in CTA's feed but our gate now rejects it (e.g. tightened the
+    // Still in Go-Metro's feed but our gate now rejects it (e.g. tightened the
     // significance filter). Mark resolved silently — the original post
-    // stays, but we stop tracking and don't post a misleading "CTA has
+    // stays, but we stop tracking and don't post a misleading "Go-Metro has
     // cleared" reply.
     if (ctaActiveIds.has(row.alert_id)) {
       if (DRY_RUN) {
         console.log(
-          `--- DRY RUN would silently close alert ${row.alert_id} (still in CTA feed but filtered out; DB write skipped) ---`,
+          `--- DRY RUN would silently close alert ${row.alert_id} (still in Go-Metro feed but filtered out; DB write skipped) ---`,
         );
         continue;
       }
       console.log(
-        `Alert ${row.alert_id} silently closed — still in CTA feed but no longer passes significance gate`,
+        `Alert ${row.alert_id} silently closed — still in Go-Metro feed but no longer passes significance gate`,
       );
       recordAlertResolved({ alertId: row.alert_id, replyUri: null });
       continue;
@@ -316,7 +316,7 @@ async function main() {
       continue;
     }
     // Pass sweepNow so the helper backdates pending_resolved_ts to this
-    // tick (the first time CTA's feed didn't include the alert).
+    // tick (the first time Go-Metro's feed didn't include the alert).
     const next = incrementAlertClearTicks(row.alert_id, sweepNow);
     if (next < ALERT_CLEAR_TICKS) {
       console.log(`Alert ${row.alert_id} missing tick ${next}/${ALERT_CLEAR_TICKS}`);

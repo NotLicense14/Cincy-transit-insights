@@ -52,7 +52,7 @@ const STOP_DOT_OFFSET_PX = 14;
  * then find the cumulative-distance positions nearest to each bus (matching by
  * straight-line proximity) and slice with CONTEXT_PAD_FT buffer around that range.
  *
- * We can't trust point.pdist for this — the CTA API only populates pdist on stops,
+ * We can't trust point.pdist for this — pdist is only populated on stops,
  * leaving waypoints at 0, which would make a naive pdist filter pull in every
  * waypoint scattered across the whole route.
  */
@@ -138,7 +138,7 @@ function computeBunchingView(bunch, pattern, extraVehicles = []) {
   // Route-wide direction bearing from the slice endpoints (smoothed over ~3000
   // ft). This avoids a short orthogonal waypoint jog dominating the arrow,
   // which previously produced 90°-off arrows on straight streets. The slice
-  // is filtered from pattern.points preserving seq order, and CTA seq runs
+  // is filtered from pattern.points preserving seq order, and seq runs
   // origin → destination along the service direction, so slice[0]→slice[end]
   // already IS the service direction. Don't second-guess with leadBus.heading
   // — a bus parked at a terminal often faces the opposite way, which would
@@ -150,7 +150,7 @@ function computeBunchingView(bunch, pattern, extraVehicles = []) {
       ? bearing(slicePoints[0], slicePoints[slicePoints.length - 1])
       : leadBus.heading;
 
-  // CTA orders pattern points by seq along the service direction, so the first
+  // Pattern points are ordered by seq along the service direction, so the first
   // point is the route's origin and the last is its destination. We mark the
   // origin with a house and the destination with a checkered flag so viewers
   // can see at a glance which way the buses are heading.
