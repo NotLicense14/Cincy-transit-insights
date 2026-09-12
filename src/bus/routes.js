@@ -286,4 +286,40 @@ const lowFrequency = [
 // alert-display lookups (CTA may still issue alerts tagged with N87, etc.).
 const allRoutes = Object.keys(names).filter((r) => !/^N\d/.test(r) || r === 'N5');
 
-module.exports = { names, gaps, ghosts, lowFrequency, allRoutes };
+// The following was taken from Trevin Flickinger:
+const shortNames = {
+  101: 'CMAX',
+};
+
+function routeShortName(route) {
+  return shortNames[route] || String(route).replace(/^0+(?=\d)/, '');
+}
+
+// Bare display label: "Route 2" for numbered routes, or just "CMAX" for
+// branded lines whose short name already reads as a full name.
+function routeLabel(route) {
+  const short = routeShortName(route);
+  return short === names[route] ? short : `Route ${short}`;
+}
+
+// Full display title with the descriptive name: "Route 2 (E Main/N High)",
+// or just "CMAX" (skips the redundant "Route CMAX (CMAX)").
+function routeTitle(route) {
+  const name = names[route];
+  const short = routeShortName(route);
+  if (!name || short === name) return routeLabel(route);
+  return `Route ${short} (${name})`;
+}
+
+module.exports = {
+  names,
+  gaps,
+  ghosts,
+  lowFrequency,
+  allRoutes,
+  routeShortName,
+  routeLabel,
+  routeTitleForPattern,
+  routeTitle,
+  branchLabelForHeadsign,
+};
