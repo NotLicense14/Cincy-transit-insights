@@ -11,14 +11,14 @@ const readline = require('node:readline');
 
 const execAsync = promisify(exec);
 
-const GTFS_URL = 'https://www.transitchicago.com/downloads/sch_data/google_transit.zip';
-const ZIP_PATH = '/tmp/cta-gtfs.zip';
+const GTFS_URL = 'https://www.go-metro.com/wp-content/uploads/2024/02/google_transit_info.zip';
+const ZIP_PATH = '/tmp/metro-gtfs.zip';
 const OUT_PATH = Path.join(__dirname, '..', 'data', 'gtfs', 'index.json');
 // Per-trip scheduled stop curves for bus schedule-adherence (scheduleDeviationMin).
 // Kept in SQLite, not index.json — it's ~1M+ rows (every bus trip × every stop).
 const SCHED_DB_PATH = Path.join(__dirname, '..', 'data', 'gtfs', 'schedule.sqlite');
 
-// Index every active CTA bus route so any consumer (bunching, speedmap,
+// Index every active metro bus route so any consumer (bunching, speedmap,
 // pulse, gaps, ghosts) can resolve schedule data without per-list bookkeeping.
 // Rail is always all 8 lines.
 const { allRoutes } = require('../src/bus/routes');
@@ -417,7 +417,7 @@ async function main() {
   const byStopId = new Map(stops.map((s) => [s.stop_id, s]));
 
   // Within each day-type, collapse schedule-identical trips (same route,
-  // direction, terminals, exact times) to one: across a schedule change CTA can
+  // direction, terminals, exact times) to one: across a schedule change metro can
   // publish the outgoing and incoming service_id family with overlapping date
   // ranges, both classed the same day-type, which would otherwise double every
   // active count and headway sample for the ~1–2 week overlap. A run that

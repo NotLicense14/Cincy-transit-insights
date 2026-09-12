@@ -16,7 +16,7 @@ const OVERPASS_URLS = [
 ];
 
 const BBOX = { minLat: 41.6, maxLat: 42.1, minLon: -87.95, maxLon: -87.5 };
-const OUT_PATH = Path.join(__dirname, '..', 'data', 'signals', 'chicago.json');
+const OUT_PATH = Path.join(__dirname, '..', 'data', 'signals', 'signals.json');
 
 async function main() {
   // Pull both highway= and crossing= tagging — many Chicago intersections

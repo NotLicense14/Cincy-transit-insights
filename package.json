@@ -1,7 +1,7 @@
 {
-  "name": "cta-insights",
-  "version": "0.0.1",
-  "description": "Bluesky bots that turn CTA train and bus tracker data into Chicago-specific transit visualizations",
+  "name": "Cincy-insights",
+  "version": "0.0.1a",
+  "description": "Bluesky bots that turn METRO train and bus tracker data into Cincy-specific transit visualizations",
   "main": "index.js",
   "dependencies": {
     "@atproto/api": "^0.18.16",
@@ -59,7 +59,10 @@
   "lint-staged": {
     "*.{js,json}": "biome check --write --no-errors-on-unmatched"
   },
-  "author": "Cailin Pitt <cailinpitt1@gmail.com> (https://cailinpitt.com)",
+  "authors": [
+    "Cailin Pitt <cailinpitt1@gmail.com> (https://cailinpitt.com)",
+    "Anthony Schoenfeldt <antonioschoenfeldt@outlook.com>"
+  ],
   "license": "ISC",
   "devDependencies": {
     "@biomejs/biome": "^2.4.13",
