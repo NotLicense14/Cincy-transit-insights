@@ -23,7 +23,7 @@ const {
 } = require('../../src/shared/history');
 const { acquireCooldown, isOnCooldown } = require('../../src/shared/state');
 const { loginBus, postText } = require('../../src/bus/bluesky');
-const { sweepProgressUpdates, thinGapUpdate } = require('../../src/shared/incidentUpdates');
+// const { sweepProgressUpdates, thinGapUpdate } = require('../../src/shared/incidentUpdates');
 const { buildRollupThread } = require('../../src/shared/post');
 const { resolveReplyRef } = require('../../src/shared/bluesky');
 const { setup, runBin } = require('../../src/shared/runBin');

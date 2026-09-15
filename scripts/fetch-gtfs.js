@@ -12,18 +12,17 @@ const readline = require('node:readline');
 const execAsync = promisify(exec);
 
 const GTFS_URL = 'https://www.go-metro.com/wp-content/uploads/2024/02/google_transit_info.zip';
-const ZIP_PATH = '/tmp/metro-gtfs.zip';
+const ZIP_PATH = '/tmp/google_transit-1.zip';
 const OUT_PATH = Path.join(__dirname, '..', 'data', 'gtfs', 'index.json');
 // Per-trip scheduled stop curves for bus schedule-adherence (scheduleDeviationMin).
 // Kept in SQLite, not index.json — it's ~1M+ rows (every bus trip × every stop).
 const SCHED_DB_PATH = Path.join(__dirname, '..', 'data', 'gtfs', 'schedule.sqlite');
 
-// Index every active metro bus route so any consumer (bunching, speedmap,
+// Index every active CTA bus route so any consumer (bunching, speedmap,
 // pulse, gaps, ghosts) can resolve schedule data without per-list bookkeeping.
-// Rail is always all 8 lines.
+// Cincy has no rail.
 const { allRoutes } = require('../src/bus/routes');
 const BUS_ROUTES = [...allRoutes].sort();
-// No rail routes — Go-Metro is bus-only.
 
 async function downloadGtfs() {
   if (Fs.existsSync(ZIP_PATH)) {
@@ -40,7 +39,11 @@ async function downloadGtfs() {
 }
 
 async function readFromZip(filename) {
-  const { stdout } = await execAsync(`unzip -p "${ZIP_PATH}" "${filename}"`, {
+  // Commented version is for linux/macOS. Windows doesn't have `unzip` by default, so use `tar` instead.
+  // const { stdout } = await execAsync(`unzip -p "${ZIP_PATH}" "${filename}"`, {
+  //   maxBuffer: 512 * 1024 * 1024,
+  // });
+  const { stdout } = await execAsync(`tar -xf "${ZIP_PATH}" "${filename}"`, {
     maxBuffer: 512 * 1024 * 1024,
   });
   return stdout;
@@ -48,7 +51,8 @@ async function readFromZip(filename) {
 
 function streamFromZip(filename, onLine) {
   return new Promise((resolve, reject) => {
-    const proc = spawn('unzip', ['-p', ZIP_PATH, filename]);
+    // const proc = spawn('unzip', ['-p', ZIP_PATH, filename]);
+    const proc = spawn('tar', ['-xf', ZIP_PATH, filename]);
     const rl = readline.createInterface({ input: proc.stdout });
     rl.on('line', onLine);
     rl.on('close', resolve);
@@ -85,14 +89,23 @@ function parseCsvLine(line) {
 
 function parseCsv(text) {
   const lines = text.split('\n').filter((l) => l.length > 0);
+
+  if (lines.length === 0) {
+    return [];
+  }
+
   const header = parseCsvLine(lines[0]);
+
   const rows = [];
   for (let i = 1; i < lines.length; i++) {
     const parts = parseCsvLine(lines[i]);
     const row = {};
-    for (let j = 0; j < header.length; j++) row[header[j]] = parts[j];
+    for (let j = 0; j < header.length; j++) {
+      row[header[j]] = parts[j];
+    }
     rows.push(row);
   }
+
   return rows;
 }
 
@@ -300,7 +313,7 @@ async function main() {
 
   console.log('Reading calendar.txt...');
   const calendars = parseCsv(await readFromZip('calendar.txt'));
-  // Cincinnati calendar date — the schedule's own timezone, not the server's.
+  // Chicago calendar date — the schedule's own timezone, not the server's.
   const todayStr = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/New_York',
     year: 'numeric',
@@ -333,7 +346,7 @@ async function main() {
   console.log('Reading trips.txt...');
   const trips = parseCsv(await readFromZip('trips.txt'));
   const busRouteSet = new Set(BUS_ROUTES);
-  const railRouteSet = new Set(); // Go-Metro is bus-only — no rail routes
+  // removed railRouteSet because cincy has no rail routes
   // tripMeta.mode (bus|rail) routes results to `routes` or `lines` output bucket.
   const tripMeta = new Map();
   for (const t of trips) {
@@ -353,7 +366,7 @@ async function main() {
     });
   }
   const busCount = [...tripMeta.values()].filter((m) => m.mode === 'bus').length;
-  const railCount = 0; // Go-Metro bus-only
+  const railCount = tripMeta.size - busCount;
   console.log(`  ${busCount} bus trips, ${railCount} rail trips in scope`);
 
   console.log('Streaming stop_times.txt...');
@@ -417,7 +430,7 @@ async function main() {
   const byStopId = new Map(stops.map((s) => [s.stop_id, s]));
 
   // Within each day-type, collapse schedule-identical trips (same route,
-  // direction, terminals, exact times) to one: across a schedule change metro can
+  // direction, terminals, exact times) to one: across a schedule change CTA can
   // publish the outgoing and incoming service_id family with overlapping date
   // ranges, both classed the same day-type, which would otherwise double every
   // active count and headway sample for the ~1–2 week overlap. A run that

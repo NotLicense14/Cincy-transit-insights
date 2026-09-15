@@ -4,271 +4,122 @@
 // group with their base number. Extend the bunching/speedmap/gaps/ghosts
 // arrays below to start tracking additional routes without touching this map.
 const names = {
-  1: 'Bronzeville/Union Station',
-  2: 'Hyde Park Express',
-  3: 'King Drive',
-  4: 'Cottage Grove',
-  X4: 'Cottage Grove Express',
-  N4: 'Cottage Grove Night Bus',
-  N5: 'South Shore Night Bus',
-  6: 'Jackson Park Express',
-  7: 'Harrison',
-  8: 'Halsted',
-  '8A': 'South Halsted',
-  9: 'Ashland',
-  X9: 'Ashland Express',
-  N9: 'Ashland Night Bus',
-  10: 'Obama Presidential Center/Museum of Science & Industry',
-  11: 'Lincoln',
-  12: 'Roosevelt',
-  J14: 'Jeffery Jump',
-  15: 'Jeffery Local',
-  18: '16th-18th',
-  19: 'United Center Express',
-  20: 'Madison',
-  N20: 'Madison Night Bus',
-  21: 'Cermak',
-  22: 'Clark',
-  N22: 'Clark Night Bus',
-  24: 'Wentworth',
-  26: 'South Shore Express',
-  28: 'Stony Island',
-  29: 'State',
-  30: 'South Chicago',
-  31: '31st',
-  34: 'South Michigan',
-  N34: 'South Michigan Night Bus',
-  35: '31st/35th',
-  36: 'Broadway',
-  37: 'Sedgwick',
-  39: 'Pershing',
-  43: '43rd',
-  44: 'Wallace/Racine',
-  47: '47th',
-  48: 'South Damen',
-  49: 'Western',
-  '49B': 'North Western',
-  X49: 'Western Express',
-  N49: 'Western Night Bus',
-  50: 'Damen',
-  51: '51st',
-  52: 'Kedzie',
-  '52A': 'South Kedzie',
-  53: 'Pulaski',
-  '53A': 'South Pulaski',
-  N53: 'Pulaski Night Bus',
-  54: 'Cicero',
-  '54A': 'North Cicero/Skokie Blvd.',
-  '54B': 'South Cicero',
-  55: 'Garfield',
-  '55A': '55th/Austin',
-  '55N': '55th/Narragansett',
-  N55: 'Garfield Night Bus',
-  56: 'Milwaukee',
-  57: 'Laramie',
-  59: '59th/61st',
-  60: 'Blue Island/26th',
-  N60: 'Blue Island/26th Night Bus',
-  62: 'Archer',
-  '62H': 'Archer/Harlem',
-  N62: 'Archer Night Bus',
-  63: '63rd',
-  '63W': 'West 63rd',
-  N63: '63rd Night Bus',
-  65: 'Grand',
-  66: 'Chicago',
-  N66: 'Chicago Night Bus',
-  67: '67th-69th-71st',
-  68: 'Northwest Highway',
-  70: 'Division',
-  71: '71st/South Shore',
-  72: 'North',
-  73: 'Armitage',
-  74: 'Fullerton',
-  75: '74th-75th',
-  76: 'Diversey',
-  77: 'Belmont',
-  N77: 'Belmont Night Bus',
-  78: 'Montrose',
-  79: '79th',
-  N79: '79th Night Bus',
-  80: 'Irving Park',
-  81: 'Lawrence',
-  '81W': 'West Lawrence',
-  N81: 'Lawrence Night Bus',
-  82: 'Kimball-Homan',
-  84: 'Peterson',
-  85: 'Central',
-  '85A': 'North Central',
-  86: 'Narragansett/Ridgeland',
-  87: '87th',
-  N87: '87th Night Bus',
-  88: 'Higgins',
-  90: 'Harlem',
-  91: 'Austin',
-  92: 'Foster',
-  93: 'California/Dodge',
-  94: 'California',
-  95: '95th',
-  96: 'Lunt',
-  97: 'Skokie',
-  100: 'Jeffery Manor Express',
-  103: 'West 103rd',
-  106: 'East 103rd',
-  108: 'Halsted/95th',
-  111: '111th/King Drive',
-  '111A': 'Pullman Shuttle',
-  112: 'Vincennes/111th',
-  115: 'Pullman/115th',
-  119: 'Michigan/119th',
-  120: 'Ogilvie/Streeterville Express',
-  121: 'Union/Streeterville Express',
-  124: 'Navy Pier',
-  125: 'Water Tower Express',
-  126: 'Jackson',
-  128: 'Soldier Field Express',
-  130: 'Museum Campus',
-  134: 'Stockton/LaSalle Express',
-  135: 'Clarendon/LaSalle Express',
-  136: 'Sheridan/LaSalle Express',
-  143: 'Stockton/Michigan Express',
-  146: 'Inner Lake Shore/Michigan Express',
-  147: 'Outer DuSable Lake Shore Express',
-  148: 'Clarendon/Michigan Express',
-  151: 'Sheridan',
-  152: 'Addison',
-  155: 'Devon',
-  156: 'LaSalle',
-  157: 'Streeterville/Taylor',
-  165: 'West 65th',
-  169: '69th/UPS Express',
-  171: 'U. of Chicago/Hyde Park',
-  172: 'U. of Chicago/Kenwood',
-  192: 'U. of Chicago Hospitals Express',
-  201: 'Central/Ridge',
-  206: 'Evanston Circulator',
+  1: 'Mt. Adams',
+  10: 'Erie Avenue',
+  11: 'Madison Road',
+  12: 'Madisonville Commuter',
+  16: 'Spring Grove / Daly',
+  17: 'Hamilton Avenue',
+  19: 'Colerain Avenue',
+  2: 'Madeira Commuter',
+  20: 'Winton Road',
+  21: 'Harrison Avenue',
+  22: 'Glenway / Madison',
+  '23X': 'Forest Park Express',
+  24: 'MLK / Beechmont',
+  25: 'Mt. Lookout Commuter',
+  27: 'Beekman / Linn',
+  28: 'East End',
+  '29X': 'Milford Express',
+  '3X': 'Montgomery Express',
+  30: 'Beechmont Commuter',
+  31: 'Taft / McMillan',
+  32: 'West 8th Street',
+  33: 'Glenway Avenue',
+  36: 'Price Hill / Uptown',
+  37: 'MLK / Westwood Northern',
+  38: 'Uptown Commuter',
+  4: 'Montgomery Road',
+  40: 'Montana Commuter',
+  41: 'North Bend Road',
+  43: 'Reading Road',
+  46: 'Avondale',
+  47: 'Avondale - Oakley',
+  49: 'Fairmount',
+  5: 'Blue Ash',
+  50: 'River Road Commuter',
+  51: 'Westwood - Avondale',
+  '52X': 'Harrison Express',
+  53: 'St. Bernard - Oakley',
+  6: 'Queen City Avenue',
+  61: 'Galbraith Road',
+  64: 'Westwood',
+  65: 'Western Hills',
+  67: 'Kemper Road',
+  70: 'UC Connector',
+  '71X': 'Kings Island Express',
+  '74X': 'Colerain Express',
+  '75X': 'Anderson Express',
+  77: 'Delhi',
+  78: 'Vine Street',
+  8: 'Blue Ash / Silverton Commuter',
+  81: 'Mt. Washington Commuter',
+  '82X': 'Eastgate Express',
 };
 
 // Routes polled for gap detection. Curated to high-frequency routes where
 // "no bus for a long stretch" is meaningful content — low-frequency routes
 // trip the threshold during normal scheduled gaps.
-const gaps = [
-  '6',
-  '8',
-  '9',
-  'X9',
-  '20',
-  '22',
-  '26',
-  '29',
-  '36',
-  '49',
-  'X49',
-  '50',
-  '55',
-  '60',
-  '62',
-  '66',
-  '72',
-  '76',
-  '77',
-  '79',
-  '80',
-  '82',
-  '94',
-  '95',
-  '146',
-  '147',
-  '151',
-];
+const gaps = ['17', '33', '43'];
 
 // Routes polled for ghost-bus detection. Independent of bunching/gaps: a
 // dedicated observer cron (scripts/observeBuses.js) fetches positions for
 // these routes on a fixed cadence so the hourly rollup has consistent coverage
 // regardless of what other jobs sampled.
-const ghosts = [
-  '6',
-  '8',
-  '9',
-  'X9',
-  'J14',
-  '15',
-  '20',
-  '22',
-  '26',
-  '29',
-  '36',
-  '49',
-  'X49',
-  '50',
-  '55',
-  '60',
-  '62',
-  '66',
-  '72',
-  '76',
-  '77',
-  '79',
-  '80',
-  '82',
-  '94',
-  '95',
-  '146',
-  '147',
-  '151',
-];
+const ghosts = ['17', '33', '43'];
 
 // Routes eligible for the thin-gap detector — median weekday daytime (6 AM–10
 // PM) headway > 15 min, the seam where curated `gaps`/`ghosts` coverage ends.
 // Regenerate after GTFS refresh: `node scripts/compute-low-frequency-routes.js`.
 const lowFrequency = [
-  '1', // 15.5 min
-  '7', // 15.5 min
-  '8A', // 16.5 min
-  '11', // 19.5 min
-  '18', // 18.0 min
-  '24', // 19.2 min
-  '30', // 19.0 min
-  '31', // 28.0 min
-  '35', // 16.0 min
-  '37', // 19.0 min
-  '39', // 21.8 min
-  '43', // 18.5 min
-  '44', // 16.5 min
-  '48', // 17.0 min
-  '51', // 18.5 min
-  '52A', // 17.0 min
-  '54A', // 25.5 min
-  '54B', // 20.0 min
-  '55A', // 23.0 min
-  '55N', // 23.0 min
-  '57', // 16.0 min
-  '59', // 18.0 min
-  '62H', // 27.0 min
-  '63W', // 23.5 min
-  '65', // 17.0 min
-  '68', // 21.0 min
-  '73', // 16.0 min
-  '81W', // 25.0 min
-  '85A', // 20.0 min
-  '86', // 20.0 min
-  '88', // 24.5 min
-  '90', // 18.5 min
-  '93', // 20.3 min
-  '96', // 30.0 min
-  '97', // 19.0 min
-  '100', // 20.0 min
-  '103', // 17.0 min
-  '108', // 19.5 min
-  '111A', // 20.0 min
-  '112', // 17.0 min
-  '124', // 24.0 min
-  '125', // 20.0 min
-  '126', // 15.5 min
-  '156', // 18.5 min
-  '165', // 25.0 min
-  '192', // 25.0 min
-  '201', // 25.0 min
+  '1',
+  '10',
+  '11',
+  '12',
+  '16',
+  '19',
+  '2',
+  '20',
+  '21',
+  '22',
+  '23X',
+  '24',
+  '25',
+  '27',
+  '28',
+  '29X',
+  '3X',
+  '30',
+  '31',
+  '32',
+  '36',
+  '37',
+  '38',
+  '4',
+  '40',
+  '41',
+  '46',
+  '47',
+  '49',
+  '5',
+  '50',
+  '51',
+  '52X',
+  '53',
+  '6',
+  '61',
+  '64',
+  '65',
+  '67',
+  '70',
+  '71X',
+  '74X',
+  '75X',
+  '77',
+  '78',
+  '8',
+  '81',
+  '82X',
 ];
 
 // Every active CTA bus route. Used by observeBuses (the single API call site
@@ -288,7 +139,8 @@ const allRoutes = Object.keys(names).filter((r) => !/^N\d/.test(r) || r === 'N5'
 
 // The following was taken from Trevin Flickinger:
 const shortNames = {
-  101: 'CMAX',
+  90: 'M+',
+  100: 'The Streetcar',
 };
 
 function routeShortName(route) {
@@ -319,7 +171,5 @@ module.exports = {
   allRoutes,
   routeShortName,
   routeLabel,
-  routeTitleForPattern,
   routeTitle,
-  branchLabelForHeadsign,
 };

@@ -16,7 +16,6 @@ const {
   paddedBbox,
   bboxOf,
 } = require('../common');
-const { pairedStationLabels } = require('../disruption');
 
 // Cap routes drawn so the Mapbox URL stays under its 8KB limit and the map
 // doesn't turn into a citywide tangle. Multi-route alerts beyond this fall
@@ -44,6 +43,55 @@ const DIM_OPACITY = 0.18;
 const ACTIVE_OPACITY = 1.0;
 const SEGMENT_STROKE = 10;
 const FOCUS_HIGHLIGHT_STROKE = 16;
+const TITLE_KEEPOUT = { x: 0, y: 0, w: 800, h: 130 };
+
+async function pairedStationLabels(stations) {
+  const layouts = [];
+  for (const s of stations) {
+    if (!s.name || !Number.isFinite(s.px.x) || !Number.isFinite(s.px.y)) continue;
+    const text = s.name.split(' (')[0];
+    const fontSize = 28;
+    const pad = 12;
+    const textW = await measureTextWidth(text, fontSize, { bold: true });
+    const pillW = textW + pad * 2;
+    const h = fontSize + pad * 1.4;
+    const xPill = Math.round(s.px.x - pillW / 2);
+    const above = Math.round(s.px.y - h - 26);
+    const below = Math.round(s.px.y + 26);
+    const wouldHitTitle =
+      above < TITLE_KEEPOUT.y + TITLE_KEEPOUT.h &&
+      xPill < TITLE_KEEPOUT.x + TITLE_KEEPOUT.w &&
+      xPill + pillW > TITLE_KEEPOUT.x;
+    const forcedBelow = above < 8 || wouldHitTitle;
+    layouts.push({ px: s.px, text, fontSize, pad, pillW, h, xPill, above, below, forcedBelow });
+  }
+  function rectsOverlap(a, b) {
+    return !(a.right < b.left || b.right < a.left || a.bottom < b.top || b.bottom < a.top);
+  }
+  function pillRect(l, y) {
+    return { left: l.xPill, right: l.xPill + l.pillW, top: y, bottom: y + l.h };
+  }
+  const ys = layouts.map((l) => (l.forcedBelow ? l.below : l.above));
+  for (let i = 0; i < layouts.length; i++) {
+    for (let j = i + 1; j < layouts.length; j++) {
+      const a = pillRect(layouts[i], ys[i]);
+      const b = pillRect(layouts[j], ys[j]);
+      if (!rectsOverlap(a, b)) continue;
+      if (!layouts[j].forcedBelow && ys[j] !== layouts[j].below) ys[j] = layouts[j].below;
+      else if (!layouts[i].forcedBelow && ys[i] !== layouts[i].below) ys[i] = layouts[i].below;
+    }
+  }
+  return layouts
+    .map((l, i) => {
+      const y = ys[i];
+      return [
+        `<rect x="${l.xPill}" y="${y}" width="${Math.round(l.pillW)}" height="${Math.round(l.h)}" fill="#000" fill-opacity="0.82" rx="8"/>`,
+        `<text x="${Math.round(l.px.x)}" y="${Math.round(y + l.h - l.pad)}" fill="#fff" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-size="${l.fontSize}" font-weight="600">${xmlEscape(l.text)}</text>`,
+        `<circle cx="${Math.round(l.px.x)}" cy="${Math.round(l.px.y)}" r="18" fill="#fff" stroke="#000" stroke-width="5"/>`,
+      ].join('');
+    })
+    .join('\n');
+}
 
 async function renderBusDisruption({ routes, getKnownPidsForRoute, loadPattern, title }) {
   if (!routes || routes.length === 0 || routes.length > MAX_ROUTES) return null;

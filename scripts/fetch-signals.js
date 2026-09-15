@@ -15,6 +15,8 @@ const OVERPASS_URLS = [
   'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
 ];
 
+// Covers the Cincy Metro Area (including Covington).
+
 const BBOX = { minLat: 38.9, maxLat: 39.4, minLon: -84.8, maxLon: -84.2 };
 const OUT_PATH = Path.join(__dirname, '..', 'data', 'signals', 'signals.json');
 

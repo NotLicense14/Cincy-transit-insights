@@ -4,8 +4,7 @@ This is a single-agency fork of the original [cta-insights project](https://gith
 
 Cincinnati has real-time GTFS data for their bus and streetcar, however, the intercity rail line does not have any real-time data. This is a Bluesky bot that turn that tracker data into Cincy-specific transit visualizations. 
 
-- **Bus**: [@](https://bsky.app/profile/)
-- **Alerts**: [@](https://bsky.app/profile/)
+- **BSKY Account**: [@go-metro-insights.bsky.social](https://bsky.app/profile/go-metro-insights.bsky.social)
 
 This README is written for operators running their own copy. If you just want to see the output, follow the accounts above. Scroll to the [Examples gallery](#examples-gallery) for sample posts.
 
@@ -15,7 +14,7 @@ This README is written for operators running their own copy. If you just want to
 - **Bunching** — clusters of buses on the same route/direction, as an annotated map. Reply includes a ~10-minute timelapse video of the cluster, with traffic signals and bus stops annotated.
 - **Gaps** — long stretches with no bus service, compared against the scheduled headway from GTFS.
 - **Speedmap** — a bus route color-coded by observed speed over a 1-hour window.
-- **Heatmap** — weekly/monthly rollup of chronic bunching + gap stops, plotted across Chicago.
+- **Heatmap** — weekly/nmonthly rollup of chronic bunching + gap stops, plotted across Chicago.
 - **Ghost buses** — hourly rollup of routes with materially fewer active buses than the schedule implies.
 
 The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
@@ -25,7 +24,7 @@ The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
 1. **Clone and install**
    ```
    git clone https://github.com/NotLicense14/Cincy-transit-insights.git
-   cd metro-insights
+   cd cincy-transit-insights
    npm install
    ```
 
@@ -42,7 +41,7 @@ The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
    | `MAPBOX_TOKEN` | Mapbox Static Images API | [account.mapbox.com](https://account.mapbox.com/access-tokens/) |
    | `BLUESKY_SERVICE` | Bluesky PDS URL | defaults to `https://bsky.social` |
    | `BLUESKY_BUS_IDENTIFIER` | Bus bot handle or DID | your Bluesky account |
-   | `BLUESKY_BUS_APP_PASSWORD` | Bus bot app password | bsky.app → Settings → App Passwords |
+   | `BLUESKY_BUS_APP_PASSWORD` | Bus bot app password | bsky.app → Settings → Privacy and Security → App Passwords |
    No API key is necessary to access Go-Metro GTFS data.
 
 4. **Build the GTFS index** — required before any gap or ghost detection runs.
@@ -57,7 +56,11 @@ The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
 
 6. **Smoke test** — loads every bin file with `--check`.
    ```
-   npm run smoke
+   # Windows
+   npm run smokeWindows
+
+   # linux/MacOS
+   npm run smokeLinux
    ```
 
 7. **Try a dry run** — writes an image under `assets/`, does not post.

@@ -12,13 +12,13 @@
 require('../../src/shared/env');
 
 const { setup, runBin } = require('../../src/shared/runBin');
-const {
-  fetchAlerts,
-  isSignificantAlert,
-  extractBetweenStations,
-  extractDirection,
-} = require('../../src/shared/ctaAlerts');
-const { sweepRelatedQuotes } = require('../../src/shared/relatedQuotes');
+// const {
+//   fetchAlerts,
+//   isSignificantAlert,
+//   extractBetweenStations,
+//   extractDirection,
+// } = require('../../src/shared/ctaAlerts');
+// const { sweepRelatedQuotes } = require('../../src/shared/relatedQuotes');
 const {
   loginAlerts,
   postText,
@@ -26,13 +26,13 @@ const {
   postWithImage,
   resolveReplyRef,
 } = require('../../src/shared/bluesky');
-const { resolvedEventLink } = require('../../src/shared/eventLink');
-const {
-  buildAlertPostText,
-  buildBusAlertAltText,
-  buildResolutionReplyText,
-  buildResolutionReplyCardTitle,
-} = require('../../src/shared/alertPost');
+// const { resolvedEventLink } = require('../../src/shared/eventLink');
+// const {
+//   buildAlertPostText,
+//   buildBusAlertAltText,
+//   buildResolutionReplyText,
+//   buildResolutionReplyCardTitle,
+// } = require('../../src/shared/alertPost');
 const {
   getAlertPost,
   recordAlertSeen,

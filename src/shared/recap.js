@@ -6,7 +6,7 @@
 const Path = require('node:path');
 const Fs = require('fs-extra');
 const { getDb } = require('./history');
-const trainStations = require('../train/data/trainStations.json');
+// const trainStations = require('../train/data/trainStations.json');
 
 const PATTERNS_DIR = Path.join(__dirname, '..', '..', 'data', 'patterns');
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -45,26 +45,26 @@ function resolveBusStopAnywhere(stopName) {
   return null;
 }
 
-function resolveTrainStation({ route, near_stop }) {
-  if (!near_stop) return null;
-  const norm = near_stop.toLowerCase();
-  // Prefer stations on the event's line, then fall back to any station.
-  const onLine = trainStations.filter((s) => !route || s.lines?.includes(route));
-  const pools = [onLine, trainStations];
-  for (const pool of pools) {
-    for (const s of pool) {
-      if (s.name.toLowerCase() === norm) return { lat: s.lat, lon: s.lon, name: s.name };
-    }
-    // startsWith handles "95th" ↔ "95th/Dan Ryan" variance.
-    for (const s of pool) {
-      const base = s.name.toLowerCase().split(' (')[0];
-      if (base === norm || base.startsWith(norm) || norm.startsWith(base)) {
-        return { lat: s.lat, lon: s.lon, name: s.name };
-      }
-    }
-  }
-  return null;
-}
+// function resolveTrainStation({ route, near_stop }) {
+//   if (!near_stop) return null;
+//   const norm = near_stop.toLowerCase();
+//   // Prefer stations on the event's line, then fall back to any station.
+//   const onLine = trainStations.filter((s) => !route || s.lines?.includes(route));
+//   const pools = [onLine, trainStations];
+//   for (const pool of pools) {
+//     for (const s of pool) {
+//       if (s.name.toLowerCase() === norm) return { lat: s.lat, lon: s.lon, name: s.name };
+//     }
+//     // startsWith handles "95th" ↔ "95th/Dan Ryan" variance.
+//     for (const s of pool) {
+//       const base = s.name.toLowerCase().split(' (')[0];
+//       if (base === norm || base.startsWith(norm) || norm.startsWith(base)) {
+//         return { lat: s.lat, lon: s.lon, name: s.name };
+//       }
+//     }
+//   }
+//   return null;
+// }
 
 // Round to 4 decimals (~11m) so events at the same intersection bucket
 // together even when patterns report slightly different stop coordinates.
@@ -113,10 +113,10 @@ function loadBusHeatmap(since, until) {
   return bucket(events, (ev) => resolveBusStop(ev) || resolveBusStopAnywhere(ev.near_stop));
 }
 
-function loadTrainHeatmap(since, until) {
-  const events = loadEvents('train', since, until);
-  return bucket(events, resolveTrainStation);
-}
+// function loadTrainHeatmap(since, until) {
+//   const events = loadEvents('train', since, until);
+//   return bucket(events, resolveTrainStation);
+// }
 
 function loadGapLeaderboard(kind, since, until) {
   const db = getDb();
@@ -224,11 +224,11 @@ function formatRangeLabel(start, end) {
 
 module.exports = {
   loadBusHeatmap,
-  loadTrainHeatmap,
+  // loadTrainHeatmap,
   loadGapLeaderboard,
   rangeForWindow,
   // exported for tests
   bucket,
-  resolveTrainStation,
+  // resolveTrainStation,
   formatRangeLabel,
 };

@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { GtfsRealtimeBindings } = require('gtfs-realtime-bindings');
+const GtfsRealtimeBindings = require('gtfs-realtime-bindings');
 const { recordBusObservations, getLatestBusSnapshot } = require('../shared/observations');
 const { withRetry } = require('../shared/retry');
 

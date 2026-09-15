@@ -12,3 +12,10 @@ plan.md
 research.md
 bugs.md
 debugging/config.sh
+
+# GTFS
+calendar_dates.txt
+calendar.txt
+stop_times.txt
+stops.txt
+trips.txt
