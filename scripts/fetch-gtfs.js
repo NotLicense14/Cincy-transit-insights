@@ -5,14 +5,15 @@ const axios = require('axios');
 const Fs = require('fs-extra');
 const Database = require('better-sqlite3');
 const Path = require('node:path');
+const Os = require('node:os');
 const { exec, spawn } = require('node:child_process');
 const { promisify } = require('node:util');
 const readline = require('node:readline');
 
 const execAsync = promisify(exec);
 
-const GTFS_URL = 'https://www.go-metro.com/wp-content/uploads/2024/02/google_transit_info.zip';
-const ZIP_PATH = '/tmp/google_transit-1.zip';
+const GTFS_URL = 'https://www.go-metro.com/wp-content/uploads/2024/12/google_transit-1.zip';
+const ZIP_PATH = Path.join(Os.tmpdir(), 'google_transit-1.zip');
 const OUT_PATH = Path.join(__dirname, '..', 'data', 'gtfs', 'index.json');
 // Per-trip scheduled stop curves for bus schedule-adherence (scheduleDeviationMin).
 // Kept in SQLite, not index.json — it's ~1M+ rows (every bus trip × every stop).
