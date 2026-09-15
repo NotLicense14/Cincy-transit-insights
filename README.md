@@ -2,7 +2,7 @@
 
 This is a single-agency fork of the original [cta-insights project](https://github.com/cailinpitt/chicago-transit-insights.git) by Cailin Pitt and is loosely based off of the [cota-insights bot](https://github.com/trevinflick/transit-insights.git) by Trevin Flickinger. 
 
-Cincinnati has real-time GTFS data for their bus and streetcar, however, the intercity rail line does not have any real-time data. This is a Bluesky bot that turn that tracker data into Cincy-specific transit visualizations. 
+Cincinnati has real-time GTFS data for Go-Metro buses and the streetcar. This is a Bluesky bot that turns that tracker data into Cincinnati-specific transit visualizations.
 
 - **BSKY Account**: [@go-metro-insights.bsky.social](https://bsky.app/profile/go-metro-insights.bsky.social)
 
@@ -14,7 +14,7 @@ This README is written for operators running their own copy. If you just want to
 - **Bunching** — clusters of buses on the same route/direction, as an annotated map. Reply includes a ~10-minute timelapse video of the cluster, with traffic signals and bus stops annotated.
 - **Gaps** — long stretches with no bus service, compared against the scheduled headway from GTFS.
 - **Speedmap** — a bus route color-coded by observed speed over a 1-hour window.
-- **Heatmap** — weekly/nmonthly rollup of chronic bunching + gap stops, plotted across Chicago.
+- **Heatmap** — weekly/monthly rollup of chronic bunching and gap stops across Cincinnati.
 - **Ghost buses** — hourly rollup of routes with materially fewer active buses than the schedule implies.
 
 The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
@@ -59,7 +59,7 @@ The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
    # Windows
    npm run smokeWindows
 
-   # linux/MacOS
+   # Linux/macOS
    npm run smokeLinux
    ```
 
@@ -75,7 +75,7 @@ Everything is designed to be driven by cron. There's no long-running process —
 Each line uses [`bin/cron-run.sh`](bin/cron-run.sh) — a small wrapper that handles `cd` to the repo root, timestamps each invocation, and redirects stdout/stderr to `cron/<log-name>-cron.log`. So a job entry is just:
 
 ```cron
-4-59/15 * * * * /home/you/metro-insights/bin/cron-run.sh train-bunching bin/train/bunching.js
+1-59/20 * * * * /home/you/metro-insights/bin/cron-run.sh bus-bunching bin/bus/bunching.js
 ```
 
 instead of repeating the boilerplate on every line. The snapshot timelapse runs in-process for ~15 minutes per invocation, so it's scheduled every 3 hours; everything else is fast and runs on its own cadence.
@@ -88,7 +88,7 @@ Each cron job appends to `cron/<name>-cron.log`, so the log files grow without b
 sudo scripts/install-logrotate.sh
 ```
 
-The installer detects the owner of the local `cron/` directory and substitutes `CRON_LOG_DIR` / `SU_USER` / `SU_GROUP` placeholders before writing to `/etc/logrotate.d/cta-insights`, then validates the result with `logrotate -d`. The system's daily logrotate timer picks it up overnight; the `su` directive is required because the cron log directory isn't root-owned.
+The installer detects the owner of the local `cron/` directory and substitutes `CRON_LOG_DIR` / `SU_USER` / `SU_GROUP` placeholders before writing to `/etc/logrotate.d/go-metro-insights`, then validates the result with `logrotate -d`. The system's daily logrotate timer picks it up overnight; the `su` directive is required because the cron log directory isn't root-owned.
 
 ### Monitoring
 
@@ -108,29 +108,21 @@ All bin scripts accept `--dry-run` (writes image under `assets/` instead of post
 | `npm run speedmap` / `:dry` | Bus speedmap collection (1-hour window) |
 | `npm run recap` / `:dry` | Bus recap — bunching heatmap + threaded gap-leaderboard reply |
 | `npm run ghosts` / `:dry` | Bus ghost rollup (hourly) |
-| `node bin/bus/alerts.js` (`ALERTS_DRY_RUN=1` or `--dry-run` for dry) | Bus alert republishing + resolution replies |
-| `node bin/audit-alerts.js` | Health audit — surfaces stuck alert posts, stuck pulse debounces, and cooldown bloat |
-
-// missing  
-| Command | Description|
-|---|---|
-| node bin/bus/cross-bunching.js (--dry-run for dry)	| Cross-route bunching (2+ routes piled up at one corner) |
-| node bin/bus/thin-gaps.js (--dry-run for dry) |	Gap detection for low-frequency routes |
-| node bin/audit-alerts.js | Health audit — surfaces cooldown bloat and stuck DB rows |
-//
+| `node bin/bus/cross-bunching.js --dry-run` | Cross-route bunching (2+ routes piled up at one corner) |
+| `node bin/bus/thin-gaps.js --dry-run` | Gap detection for low-frequency routes |
 
 ### Observers / maintenance
 | Command | Description |
 |---|---|
 | `npm run observe-buses` | Bus observer — fetches every active Metro route and records positions (no posting). Run every minute. |
 | `npm run fetch-gtfs` | Rebuild `data/gtfs/index.json`. Run daily. |
-| `npm run fetch-signals` | Rebuild `data/signals/chicago.json` from OpenStreetMap. Run monthly. |
+| `npm run fetch-signals` | Rebuild `data/signals/signals.json` from OpenStreetMap. Run monthly. |
 
 ### Dev
 | Command | Description |
 |---|---|
 | `npm test` | Run the test suite (`node --test`). |
-| `npm run smoke` | Load each bin with `--check` — fast sanity check after edits. |
+| `npm run smokeWindows` / `npm run smokeLinux` | Load each bus bin with `--check` — fast sanity check after edits. |
 | `npm run format` | Format all JS/JSON with [Biome](https://biomejs.dev/). |
 | `npm run lint` | Report Biome lint warnings (no changes written). |
 | `npm run check` | Format + apply safe lint fixes across the whole repo. |

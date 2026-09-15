@@ -3,7 +3,6 @@ const assert = require('node:assert/strict');
 const { detectBusGhosts, MIN_SNAPSHOTS } = require('../src/bus/ghosts');
 const { describeGhost } = require('../src/shared/ghostFormat');
 const { buildRollupPost } = require('../src/shared/post');
-const { detectTrainGhosts } = require('../src/train/ghosts');
 
 // Build a synthetic observation stream: `snapshots` polling timestamps, and at
 // each one, `vidsPerSnapshot` distinct vids sharing `pid`. Used to shape
@@ -379,33 +378,6 @@ test('bus formatLine: ratio <= 3 keeps effective-headway estimate', () => {
   assert.match(out, /every ~17 min instead of ~10$/);
 });
 
-test('train formatLine: ratio > 3 drops effective-headway estimate', () => {
-  const { formatLine } = require('../bin/train/ghosts');
-  const out = formatLine({
-    line: 'red',
-    destination: 'Howard',
-    missing: 10,
-    expectedActive: 12,
-    observedActive: 1,
-    headway: 8,
-  });
-  assert.match(out, /scheduled every ~8 min$/);
-  assert.doesNotMatch(out, /instead of/);
-});
-
-test('train formatLine: ratio <= 3 keeps effective-headway estimate', () => {
-  const { formatLine } = require('../bin/train/ghosts');
-  const out = formatLine({
-    line: 'red',
-    destination: 'Howard',
-    missing: 4,
-    expectedActive: 12,
-    observedActive: 8,
-    headway: 8,
-  });
-  assert.match(out, /every ~12 min instead of ~8$/);
-});
-
 test('sanity gate: MIN_OBSERVED blocks events when observed drops below 2', async () => {
   // Headway 6, duration 60 → expected 10. Observed 1 → missing 9, pct 90%,
   // passes the main thresholds but fails the observed-floor sanity gate.
@@ -539,30 +511,6 @@ test('ramp-up gate: fires on mid-window outage even if tail partially recovers (
     expectedActive: () => 12,
   });
   assert.equal(events.length, 1);
-});
-
-test('ramp-up gate applies to trains too (loop line)', async () => {
-  // Brown line loop — expected 9 (duration 45 / headway 5). Counts ramp 1 → 8.
-  // Tail median 8 ≥ 0.8 × 9 = 7.2 → suppressed.
-  const rows = [];
-  const ts0 = 1_700_000_000_000;
-  const counts = [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 8];
-  for (let i = 0; i < counts.length; i++) {
-    const ts = ts0 + i * 5 * 60 * 1000;
-    for (let v = 0; v < counts[i]; v++) {
-      rows.push({ ts, direction: null, vehicle_id: `v${v}`, destination: null });
-    }
-  }
-  const events = await detectTrainGhosts({
-    lines: ['Brn'],
-    getObservations: () => rows,
-    findStation: () => ({ lat: 0, lon: 0, name: 'Kimball', isTerminal: true }),
-    expectedHeadway: () => 5,
-    expectedDuration: () => 45,
-    expectedActive: () => 9,
-    isLoopLine: () => true,
-  });
-  assert.equal(events.length, 0);
 });
 
 // --- describeGhost: counts + headway derived from one set of rounded integers ---

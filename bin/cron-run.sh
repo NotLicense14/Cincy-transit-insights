@@ -15,10 +15,9 @@ printf "\n\n=== $(date) $NAME ===\n" >> "$LOG"
 # (and thus auto-create a check); the curated set keeps us under the 20-check
 # free tier and is the committed source of truth for "what's watched" — edit it
 # here and `git pull` on the server to widen/narrow coverage. Jobs not listed
-# simply don't ping. (push-web-data isn't run via this wrapper; it pings from
-# its own script.) No-op entirely unless cron/healthchecks.env exists (see the
+# simply don't ping. No-op entirely unless cron/healthchecks.env exists (see the
 # .example).
-HC_MONITORED="observe-buses observe-trains bus-alerts bus-pulse train-alerts train-pulse bus-bunching bus-gaps bus-ghosts bus-thin-gaps train-bunching train-gaps train-ghosts bus-speedmap train-speedmap fetch-gtfs audit-alerts export-event-tracks"
+HC_MONITORED="observe-buses bus-bunching bus-gaps bus-ghosts bus-thin-gaps bus-speedmap fetch-gtfs export-event-tracks"
 [ -f cron/healthchecks.env ] && . cron/healthchecks.env
 case " $HC_MONITORED " in *" $NAME "*) hc_watched=1 ;; *) hc_watched= ;; esac
 
