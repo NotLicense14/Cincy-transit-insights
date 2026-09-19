@@ -37,7 +37,7 @@ hc_ping() {
 # still sends the completion ping instead of aborting the wrapper before it.
 hc_ping start
 set +e
-/usr/bin/node "$SCRIPT" "$@" >> "$LOG" 2>&1
+node "$SCRIPT" "$@" >> "$LOG" 2>&1
 rc=$?
 hc_ping "$rc"
 

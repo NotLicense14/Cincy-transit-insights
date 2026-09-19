@@ -16,8 +16,10 @@ FROM node:22-bookworm-slim
 # via the system font stack — with none installed, every label (legends,
 # bus-position numbers, callout text) silently drew blank instead of erroring,
 # which is why it looked fine in logs but wrong in the actual post images.
+# dos2unix converts Windows line endings to Unix (critical when the repo is
+# checked out with autocrlf or git line-ending filters on Windows).
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cron curl ca-certificates sqlite3 unzip fontconfig fonts-inter fonts-dejavu-core \
+    cron curl ca-certificates sqlite3 unzip fontconfig fonts-inter fonts-dejavu-core dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -32,6 +34,12 @@ RUN npm pkg delete scripts.prepare && npm ci --omit=dev
 
 COPY . .
 
+# Convert Windows line endings to Unix in shell scripts and cron config before
+# they're used by crontab or bash. This is critical when the repo is checked
+# out with autocrlf or git line-ending filters on Windows.
+RUN find /app/bin -name '*.sh' -exec dos2unix {} + && \
+    dos2unix /app/cron/crontab.txt
+
 # state/ and data/ are gitignored (runtime DB + GTFS cache) — create them so
 # the bind-mounted volumes in docker-compose.yml have somewhere to land even
 # before the first run populates them.
@@ -39,7 +47,8 @@ RUN mkdir -p /app/state /app/data/gtfs /app/data/patterns
 
 # Bake the cron schedule into root's crontab, substituting the placeholder
 # repo path for this image's checkout — mirrors what scripts/install-crontab.sh
-# does for a host crontab, just targeting the image instead.
-RUN sed 's#/path/to/metro-insights#/app#g' cron/crontab.txt | crontab -
+# does for a host crontab, just targeting the image instead. Use sh -c to
+# explicitly set line endings on the installed crontab.
+RUN sed 's#/path/to/metro-insights#/app#g' cron/crontab.txt | sh -c 'dos2unix && crontab -'
 
 CMD ["cron", "-f"]
