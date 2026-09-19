@@ -15,7 +15,7 @@
 # placeholder so cron's minimal environment finds bin/cron-run.sh and the
 # standalone shell scripts. (Jobs run node via bin/cron-run.sh, which resolves
 # `node` from cron's PATH — there is no node-path placeholder to fill.)
-set -euo pipefail
+set -eu
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BLOCK_FILE="$REPO/cron/crontab.txt"

@@ -44,6 +44,8 @@ The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
    | `BLUESKY_BUS_APP_PASSWORD` | Bus bot app password | bsky.app → Settings → Privacy and Security → App Passwords |
    No API key is necessary to access Go-Metro GTFS data.
 
+** All the following require the prefix `docker compose exec cincy-transit-insights` **
+
 4. **Build the GTFS index** — required before any gap or ghost detection runs.
    ```
    npm run fetch-gtfs
@@ -56,10 +58,6 @@ The bus bot tracks a subset of Go-METRO routes — see `src/bus/routes.js`.
 
 6. **Smoke test** — loads every bin file with `--check`.
    ```
-   # Windows
-   npm run smokeWindows
-
-   # Linux/macOS
    npm run smokeLinux
    ```
 
@@ -102,7 +100,7 @@ All bin scripts accept `--dry-run` (writes image under `assets/` instead of post
 
 ### Posting
 | Command | Description |
-|---|---|
+|---|---|---|
 | `npm run bunching` / `:dry` | Bus bunching detection |
 | `npm run gaps` / `:dry` | Bus gap detection |
 | `npm run speedmap` / `:dry` | Bus speedmap collection (1-hour window) |
@@ -122,7 +120,7 @@ All bin scripts accept `--dry-run` (writes image under `assets/` instead of post
 | Command | Description |
 |---|---|
 | `npm test` | Run the test suite (`node --test`). |
-| `npm run smokeWindows` / `npm run smokeLinux` | Load each bus bin with `--check` — fast sanity check after edits. |
+| `npm run smoke` | Load each bus bin with `--check` — fast sanity check after edits. |
 | `npm run format` | Format all JS/JSON with [Biome](https://biomejs.dev/). |
 | `npm run lint` | Report Biome lint warnings (no changes written). |
 | `npm run check` | Format + apply safe lint fixes across the whole repo. |

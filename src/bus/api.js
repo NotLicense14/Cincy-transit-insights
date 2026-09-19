@@ -78,14 +78,80 @@ async function getVehiclesCachedOrFresh(routes, { maxStaleMs = 90 * 1000 } = {})
   return { vehicles, now: new Date(), source: 'fetch' };
 }
 
-// Pattern lookup — for Go-Metro, shape geometry comes from the static GTFS
-// index (data/gtfs/index.json) rather than a live API call. This stub
-// maintains the same interface so callers don't need to change.
-async function getPattern(pid) {
-  const { getTripMeta } = require('../shared/gtfs');
-  const meta = getTripMeta(pid);
-  if (!meta) throw new Error(`No pattern found for pid ${pid}`);
-  return meta;
+// Pattern lookup — constructs pattern geometry from the schedule DB.
+// Fetches all stops for a trip, calculates distances, and returns as a pattern object.
+async function getPattern(tripId) {
+  const Path = require('node:path');
+  const Fs = require('fs-extra');
+  const Database = require('better-sqlite3');
+  const { haversineFt } = require('../shared/geo');
+  const { loadIndex } = require('../shared/gtfs');
+
+  const SCHED_DB_PATH =
+    process.env.GTFS_SCHEDULE_DB_PATH ||
+    Path.join(__dirname, '..', '..', 'data', 'gtfs', 'schedule.sqlite');
+
+  try {
+    if (!Fs.existsSync(SCHED_DB_PATH)) {
+      throw new Error(`Schedule DB not found at ${SCHED_DB_PATH}`);
+    }
+    const db = new Database(SCHED_DB_PATH, { readonly: true });
+    // Query sched_stops for this trip, ordered by sequence
+    const stmt = db.prepare(
+      'SELECT route, trip_id, lat, lon, sched_sec FROM sched_stops WHERE trip_id = ? ORDER BY seq ASC',
+    );
+    const stops = stmt.all(String(tripId));
+    db.close();
+
+    if (stops.length < 2) {
+      throw new Error(`Trip ${tripId} has < 2 stops in schedule DB`);
+    }
+
+    const route = String(stops[0].route);
+    const index = loadIndex();
+    const byRoute = index.routes?.[route];
+    if (!byRoute) {
+      throw new Error(`Route ${route} not indexed`);
+    }
+
+    // Build points array with distances
+    const points = [];
+    let totalFt = 0;
+    for (let i = 0; i < stops.length; i++) {
+      const stop = stops[i];
+      let pdist = 0;
+      if (i > 0) {
+        const prev = stops[i - 1];
+        pdist = haversineFt({ lat: prev.lat, lon: prev.lon }, { lat: stop.lat, lon: stop.lon });
+        totalFt += pdist;
+      }
+      points.push({
+        type: 'S',
+        lat: stop.lat,
+        lon: stop.lon,
+        pdist: totalFt,
+        schedSec: stop.sched_sec,
+      });
+    }
+
+    // Use direction 0 info from index as template
+    const dirInfo = byRoute['0'] || Object.values(byRoute)[0];
+    const pattern = {
+      pid: String(tripId),
+      route,
+      direction: '0',
+      headsign: dirInfo?.headsign || `Trip ${tripId}`,
+      lengthFt: totalFt,
+      points,
+      // Inherit schedule expectations from the route/direction
+      headways: dirInfo?.headways || null,
+      durations: dirInfo?.durations || null,
+    };
+
+    return pattern;
+  } catch (e) {
+    throw new Error(`getPattern failed for trip ${tripId}: ${e.message}`);
+  }
 }
 
 module.exports = {

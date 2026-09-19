@@ -4,7 +4,7 @@
 # the template so the repo file stays user-agnostic.
 #
 # Run on the server: sudo scripts/install-logrotate.sh
-set -euo pipefail
+set -eu
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO_DIR/cron/logrotate.conf"

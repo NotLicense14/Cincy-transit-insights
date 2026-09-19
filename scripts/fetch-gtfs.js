@@ -44,7 +44,7 @@ async function readFromZip(filename) {
   // const { stdout } = await execAsync(`unzip -p "${ZIP_PATH}" "${filename}"`, {
   //   maxBuffer: 512 * 1024 * 1024,
   // });
-  const { stdout } = await execAsync(`tar -xf "${ZIP_PATH}" "${filename}"`, {
+  const { stdout } = await execAsync(`unzip -p "${ZIP_PATH}" "${filename}"`, {
     maxBuffer: 512 * 1024 * 1024,
   });
   return stdout;
@@ -52,8 +52,7 @@ async function readFromZip(filename) {
 
 function streamFromZip(filename, onLine) {
   return new Promise((resolve, reject) => {
-    // const proc = spawn('unzip', ['-p', ZIP_PATH, filename]);
-    const proc = spawn('tar', ['-xf', ZIP_PATH, filename]);
+    const proc = spawn('unzip', ['-p', ZIP_PATH, filename]);
     const rl = readline.createInterface({ input: proc.stdout });
     rl.on('line', onLine);
     rl.on('close', resolve);
@@ -353,7 +352,6 @@ async function main() {
   for (const t of trips) {
     let mode = null;
     if (busRouteSet.has(t.route_id)) mode = 'bus';
-    else if (railRouteSet.has(t.route_id)) mode = 'rail';
     if (!mode) continue;
     const dayTypes = serviceDayType.get(t.service_id);
     if (!dayTypes || dayTypes.size === 0) continue;

@@ -131,10 +131,10 @@ function loadGapLeaderboard(kind, since, until) {
   return rows.map((r) => ({ route: r.route, count: r.count }));
 }
 
-// Probe both CT offsets (CST=-6, CDT=-5) and pick the one that round-trips
+// Probe both NY offsets (EST=-5, EDT=-4) and pick the one that round-trips
 // to the desired wall time — avoids pulling in a tz library.
 function ctWallTimeAsUtcMs(year, month, day, hour) {
-  for (const offsetHours of [5, 6]) {
+  for (const offsetHours of [4, 5]) {
     const candidate = Date.UTC(year, month - 1, day, offsetHours, 0, 0);
     const parts = new Intl.DateTimeFormat('en-US', {
       timeZone: 'America/New_York',
